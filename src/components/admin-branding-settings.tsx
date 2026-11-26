@@ -117,7 +117,7 @@ function ItemShell({
         <h4 className="text-sm font-semibold text-zinc-200">{title}</h4>
         {onRemove ? (
           <button type="button" onClick={onRemove} className={actionButtonClass}>
-            Remove
+            Eemalda
           </button>
         ) : null}
       </div>
@@ -136,7 +136,7 @@ function SectionIntroFields({
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-        Eyebrow
+        Ülapealkiri (Eyebrow)
         <input
           type="text"
           value={intro.eyebrow}
@@ -145,7 +145,7 @@ function SectionIntroFields({
         />
       </label>
       <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-        Title
+        Pealkiri
         <input
           type="text"
           value={intro.title}
@@ -154,7 +154,7 @@ function SectionIntroFields({
         />
       </label>
       <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-3">
-        Description
+        Kirjeldus
         <textarea
           rows={3}
           value={intro.description}
@@ -175,11 +175,11 @@ export function AdminBrandingSettings() {
   useEffect(() => {
     fetch("/api/admin/site-settings")
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to load settings");
+        if (!res.ok) throw new Error("Seadete laadimine ebaõnnestus");
         return res.json();
       })
       .then((data) => setSettings(data))
-      .catch(() => toast.addToast("Failed to load branding settings", "error"))
+      .catch(() => toast.addToast("Brändingu seadete laadimine ebaõnnestus", "error"))
       .finally(() => setLoading(false));
   }, [toast]);
 
@@ -188,7 +188,7 @@ export function AdminBrandingSettings() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.addToast("Please upload an image file.", "error");
+      toast.addToast("Palun laadi üles pildifail.", "error");
       return;
     }
 
@@ -213,14 +213,14 @@ export function AdminBrandingSettings() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        toast.addToast(data.error || "Failed to save settings", "error");
+        toast.addToast(data.error || "Seadete salvestamine ebaõnnestus", "error");
         return;
       }
 
       setSettings(data);
-      toast.addToast("Settings saved. Refresh public pages to see changes.", "success");
+      toast.addToast("Seaded salvestatud! Värskenda lehte, et muudatusi näha.", "success");
     } catch {
-      toast.addToast("Failed to save settings", "error");
+      toast.addToast("Seadete salvestamine ebaõnnestus", "error");
     } finally {
       setSaving(false);
     }
@@ -342,15 +342,15 @@ export function AdminBrandingSettings() {
   }
 
   if (loading) {
-    return <p className="text-zinc-500">Loading branding settings...</p>;
+    return <p className="text-zinc-500">Brändingu seadete laadimine...</p>;
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Section title="Core branding">
+      <Section title="Põhibränding">
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Server name
+            Serveri nimi
             <input
               type="text"
               value={settings.serverName}
@@ -361,7 +361,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Site name
+            Veebilehe nimi
             <input
               type="text"
               value={settings.siteName}
@@ -372,7 +372,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Header icon
+            Päise ikoon
             <input
               type="text"
               value={settings.headerIcon}
@@ -383,7 +383,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Discord link
+            Discordi link
             <input
               type="url"
               value={settings.discordLink}
@@ -394,7 +394,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Whitelist nav label
+            Whitelisti menüü tekst
             <input
               type="text"
               value={settings.whitelistNavLabel}
@@ -405,7 +405,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Store nav label
+            Poe menüü tekst
             <input
               type="text"
               value={settings.storeNavLabel}
@@ -416,7 +416,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Discord widget server ID
+            Discordi vidina serveri ID
             <input
               type="text"
               value={settings.discordWidgetServerId}
@@ -430,7 +430,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            FiveM server detail ID
+            FiveM serveri detail-ID
             <input
               type="text"
               value={settings.fivemServerDetailId}
@@ -445,7 +445,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            DM author name
+            Privaatsõnumi (DM) autori nimi
             <input
               type="text"
               value={settings.discordDmAuthorName}
@@ -459,7 +459,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Primary color
+            Põhivärv
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <input
                 type="color"
@@ -483,12 +483,12 @@ export function AdminBrandingSettings() {
       </Section>
 
       <Section
-        title="Homepage hero"
-        description="Keep the top of the homepage short and clean. Use tokens like {serverName}, {discordLink}, and {applyUrl}."
+        title="Avalehe ülaosa (Hero)"
+        description="Hoia avalehe ülaosa lühike ja puhas. Kasuta märke nagu {serverName}, {discordLink} ja {applyUrl}."
       >
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Hero badge
+            Ülaosa silt (Badge)
             <input
               type="text"
               value={settings.homepage.hero.badge}
@@ -497,7 +497,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Background image URL
+            Taustapildi URL
             <input
               type="text"
               value={settings.homepage.hero.backgroundImageUrl}
@@ -507,7 +507,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Hero headline
+            Avalehe pealkiri
             <input
               type="text"
               value={settings.homepage.hero.title}
@@ -516,7 +516,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Hero subheadline
+            Avalehe alapealkiri
             <textarea
               rows={3}
               value={settings.homepage.hero.subtitle}
@@ -527,11 +527,11 @@ export function AdminBrandingSettings() {
           {(["primaryButton", "secondaryButton"] as const).map((buttonKey) => (
             <div key={buttonKey} className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
               <h4 className="text-sm font-semibold capitalize text-zinc-200">
-                {buttonKey === "primaryButton" ? "Primary button" : "Secondary button"}
+                {buttonKey === "primaryButton" ? "Peamine nupp" : "Teisene nupp"}
               </h4>
               <div className="grid gap-4">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Label
+                  Tekst (Label)
                   <input
                     type="text"
                     value={settings.homepage.hero[buttonKey].label}
@@ -553,7 +553,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Tone
+                  Stiil
                   <select
                     value={settings.homepage.hero[buttonKey].tone}
                     onChange={(event) =>
@@ -566,8 +566,8 @@ export function AdminBrandingSettings() {
                     className={inputClass}
                   >
                     <option value="discord">Discord</option>
-                    <option value="primary">Primary</option>
-                    <option value="secondary">Secondary</option>
+                    <option value="primary">Peamine (Primary)</option>
+                    <option value="secondary">Teisene (Secondary)</option>
                   </select>
                 </label>
                 <label className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm font-medium text-zinc-300">
@@ -578,13 +578,13 @@ export function AdminBrandingSettings() {
                       updateHeroButton(buttonKey, "openInNewTab", event.target.checked)
                     }
                   />
-                  Open in new tab
+                  Ava uuel vahekaardil
                 </label>
               </div>
             </div>
           ))}
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Snapshot eyebrow
+            Ülevaate ülapealkiri
             <input
               type="text"
               value={settings.homepage.hero.snapshotEyebrow}
@@ -593,7 +593,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Snapshot title
+            Ülevaate pealkiri
             <input
               type="text"
               value={settings.homepage.hero.snapshotTitle}
@@ -602,7 +602,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Snapshot description
+            Ülevaate kirjeldus
             <textarea
               rows={3}
               value={settings.homepage.hero.snapshotDescription}
@@ -611,32 +611,32 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Snapshot tags
+            Ülevaate sildid
             <textarea
               rows={4}
               value={stepsToText(settings.homepage.hero.snapshotTags)}
               onChange={(event) => updateHero("snapshotTags", textToSteps(event.target.value))}
               className={inputClass}
-              placeholder="One tag per line"
+              placeholder="Üks silt rea kohta"
             />
           </label>
         </div>
       </Section>
 
       <Section
-        title="Homepage stats"
-        description="Values can use tokens like {playersOnline}, {maxPlayers}, {serverConnect}, {members}, {staffCount}, {jobsCount}, {pendingApps}, and {serverStatus}."
+        title="Avalehe statistika"
+        description="Väärtustes saab kasutada märke nagu {playersOnline}, {maxPlayers}, {serverConnect}, {members}, {staffCount}, {jobsCount}, {pendingApps} ja {serverStatus}."
       >
         <div className="space-y-4">
           {settings.homepage.stats.map((stat, index) => (
             <ItemShell
               key={`${stat.label}-${index}`}
-              title={`Stat ${index + 1}`}
+              title={`Statistika ${index + 1}`}
               onRemove={() => updateStats(settings.homepage.stats.filter((_, itemIndex) => itemIndex !== index))}
             >
               <div className="grid gap-4 lg:grid-cols-3">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Label
+                  Silt (Label)
                   <input
                     type="text"
                     value={stat.label}
@@ -651,7 +651,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Value
+                  Väärtus
                   <input
                     type="text"
                     value={stat.value}
@@ -666,7 +666,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Tone
+                  Stiil
                   <select
                     value={stat.tone}
                     onChange={(event) =>
@@ -683,8 +683,8 @@ export function AdminBrandingSettings() {
                     }
                     className={inputClass}
                   >
-                    <option value="default">Default</option>
-                    <option value="success">Success</option>
+                    <option value="default">Tavaline (Default)</option>
+                    <option value="success">Esiletõstetud (Success)</option>
                   </select>
                 </label>
               </div>
@@ -695,19 +695,19 @@ export function AdminBrandingSettings() {
             onClick={() =>
               updateStats([
                 ...settings.homepage.stats,
-                { label: "New stat", value: "Value", tone: "default" },
+                { label: "Uus statistika", value: "Väärtus", tone: "default" },
               ])
             }
             className={actionButtonClass}
           >
-            Add stat
+            Lisa statistika
           </button>
         </div>
       </Section>
 
       <Section
-        title="Homepage features"
-        description="This should stay compact. Four to six cards is usually enough."
+        title="Avalehe võimalused (Features)"
+        description="Hoia see jaotis kompaktsena. Tavaliselt piisab neljast kuni kuuest kaardist."
       >
         <div className="space-y-4">
           <SectionIntroFields
@@ -717,7 +717,7 @@ export function AdminBrandingSettings() {
           {settings.homepage.features.items.map((item, index) => (
             <ItemShell
               key={`${item.title}-${index}`}
-              title={`Feature ${index + 1}`}
+              title={`Võimalus ${index + 1}`}
               onRemove={() =>
                 updateFeatureItems(
                   settings.homepage.features.items.filter((_, itemIndex) => itemIndex !== index)
@@ -726,7 +726,7 @@ export function AdminBrandingSettings() {
             >
               <div className="grid gap-4 lg:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Title
+                  Pealkiri
                   <input
                     type="text"
                     value={item.title}
@@ -743,7 +743,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Description
+                  Kirjeldus
                   <textarea
                     rows={3}
                     value={item.description}
@@ -767,17 +767,17 @@ export function AdminBrandingSettings() {
             onClick={() =>
               updateFeatureItems([
                 ...settings.homepage.features.items,
-                { title: "New feature", description: "" },
+                { title: "Uus võimalus", description: "" },
               ])
             }
             className={actionButtonClass}
           >
-            Add feature
+            Lisa võimalus
           </button>
         </div>
       </Section>
 
-      <Section title="Homepage gallery" description="Use a few strong screenshots and keep the gallery small.">
+      <Section title="Avalehe galerii" description="Kasuta mõnda tugevat ekraanipilti ja hoia galerii lühike.">
         <div className="space-y-4">
           <SectionIntroFields
             intro={settings.homepage.gallery}
@@ -786,7 +786,7 @@ export function AdminBrandingSettings() {
           {settings.homepage.gallery.items.map((item, index) => (
             <ItemShell
               key={`${item.title}-${index}`}
-              title={`Gallery item ${index + 1}`}
+              title={`Galerii pilt ${index + 1}`}
               onRemove={() =>
                 updateGalleryItems(
                   settings.homepage.gallery.items.filter((_, itemIndex) => itemIndex !== index)
@@ -795,7 +795,7 @@ export function AdminBrandingSettings() {
             >
               <div className="grid gap-4 lg:grid-cols-3">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Title
+                  Pealkiri
                   <input
                     type="text"
                     value={item.title}
@@ -812,7 +812,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Description
+                  Kirjeldus
                   <input
                     type="text"
                     value={item.description}
@@ -829,7 +829,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Image URL
+                  Pildi URL
                   <input
                     type="text"
                     value={item.imageUrl}
@@ -843,7 +843,7 @@ export function AdminBrandingSettings() {
                       )
                     }
                     className={inputClass}
-                    placeholder="https://... or data:image/..."
+                    placeholder="https://... või data:image/..."
                   />
                 </label>
               </div>
@@ -854,17 +854,16 @@ export function AdminBrandingSettings() {
             onClick={() =>
               updateGalleryItems([
                 ...settings.homepage.gallery.items,
-                { title: "New screenshot", description: "", imageUrl: "" },
+                { title: "Uus ekraanipilt", description: "", imageUrl: "" },
               ])
             }
             className={actionButtonClass}
           >
-            Add gallery item
+            Lisa galerii pilt
           </button>
         </div>
       </Section>
-
-      <Section title="How to join" description="Three steps usually feels cleaner than a long onboarding list.">
+      <Section title="Kuidas liituda" description="Kolm sammu mõjub tavaliselt selgemalt kui pikk juhendite nimekiri.">
         <div className="space-y-4">
           <SectionIntroFields
             intro={settings.homepage.join}
@@ -873,7 +872,7 @@ export function AdminBrandingSettings() {
           {settings.homepage.join.items.map((item, index) => (
             <ItemShell
               key={`${item.title}-${index}`}
-              title={`Step ${index + 1}`}
+              title={`Samm ${index + 1}`}
               onRemove={() =>
                 updateJoinItems(
                   settings.homepage.join.items.filter((_, itemIndex) => itemIndex !== index)
@@ -882,7 +881,7 @@ export function AdminBrandingSettings() {
             >
               <div className="grid gap-4 lg:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Title
+                  Pealkiri
                   <input
                     type="text"
                     value={item.title}
@@ -897,7 +896,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Description
+                  Kirjeldus
                   <textarea
                     rows={3}
                     value={item.description}
@@ -921,17 +920,17 @@ export function AdminBrandingSettings() {
             onClick={() =>
               updateJoinItems([
                 ...settings.homepage.join.items,
-                { title: "New step", description: "" },
+                { title: "Uus samm", description: "" },
               ])
             }
             className={actionButtonClass}
           >
-            Add step
+            Lisa samm
           </button>
         </div>
       </Section>
 
-      <Section title="Departments" description="List the main roles or factions that make the city feel active.">
+      <Section title="Asutused ja fraktsioonid" description="Loetle peamised ametid või rühmitused, mis linna aktiivsena hoiavad.">
         <div className="space-y-4">
           <SectionIntroFields
             intro={settings.homepage.departments}
@@ -940,7 +939,7 @@ export function AdminBrandingSettings() {
           {settings.homepage.departments.items.map((item, index) => (
             <ItemShell
               key={`${item.name}-${index}`}
-              title={`Department ${index + 1}`}
+              title={`Asutus ${index + 1}`}
               onRemove={() =>
                 updateDepartmentItems(
                   settings.homepage.departments.items.filter(
@@ -951,7 +950,7 @@ export function AdminBrandingSettings() {
             >
               <div className="grid gap-4 lg:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Name
+                  Nimi
                   <input
                     type="text"
                     value={item.name}
@@ -968,7 +967,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Summary
+                  Kokkuvõte
                   <textarea
                     rows={3}
                     value={item.summary}
@@ -992,17 +991,17 @@ export function AdminBrandingSettings() {
             onClick={() =>
               updateDepartmentItems([
                 ...settings.homepage.departments.items,
-                { name: "New department", summary: "" },
+                { name: "Uus asutus", summary: "" },
               ])
             }
             className={actionButtonClass}
           >
-            Add department
+            Lisa asutus
           </button>
         </div>
       </Section>
 
-      <Section title="Announcements" description="Use this for patch notes, events, or recruitment updates.">
+      <Section title="Teadaanded" description="Kasuta seda uuenduste, sündmuste või värbamisteate jaoks.">
         <div className="space-y-4">
           <SectionIntroFields
             intro={settings.homepage.announcements}
@@ -1011,7 +1010,7 @@ export function AdminBrandingSettings() {
           {settings.homepage.announcements.items.map((item, index) => (
             <ItemShell
               key={`${item.title}-${index}`}
-              title={`Announcement ${index + 1}`}
+              title={`Teadaanne ${index + 1}`}
               onRemove={() =>
                 updateAnnouncementItems(
                   settings.homepage.announcements.items.filter(
@@ -1022,7 +1021,7 @@ export function AdminBrandingSettings() {
             >
               <div className="grid gap-4 lg:grid-cols-3">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Tag
+                  Silt (Tag)
                   <input
                     type="text"
                     value={item.tag}
@@ -1039,7 +1038,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-                  Title
+                  Pealkiri
                   <input
                     type="text"
                     value={item.title}
@@ -1056,7 +1055,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-3">
-                  Body
+                  Sisu
                   <textarea
                     rows={3}
                     value={item.body}
@@ -1080,17 +1079,17 @@ export function AdminBrandingSettings() {
             onClick={() =>
               updateAnnouncementItems([
                 ...settings.homepage.announcements.items,
-                { tag: "", title: "New announcement", body: "" },
+                { tag: "", title: "Uus teadaanne", body: "" },
               ])
             }
             className={actionButtonClass}
           >
-            Add announcement
+            Lisa teadaanne
           </button>
         </div>
       </Section>
 
-      <Section title="FAQ" description="Keep answers short. This section should remove confusion, not create more.">
+      <Section title="KKK (Korduma kippuvad küsimused)" description="Hoia vastused lühikesed. See jaotis peaks segadust vähendama, mitte juurde tekitama.">
         <div className="space-y-4">
           <SectionIntroFields
             intro={settings.homepage.faq}
@@ -1099,7 +1098,7 @@ export function AdminBrandingSettings() {
           {settings.homepage.faq.items.map((item, index) => (
             <ItemShell
               key={`${item.question}-${index}`}
-              title={`FAQ ${index + 1}`}
+              title={`Küsimus ${index + 1}`}
               onRemove={() =>
                 updateFaqItems(
                   settings.homepage.faq.items.filter((_, itemIndex) => itemIndex !== index)
@@ -1108,7 +1107,7 @@ export function AdminBrandingSettings() {
             >
               <div className="grid gap-4">
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Question
+                  Küsimus
                   <input
                     type="text"
                     value={item.question}
@@ -1123,7 +1122,7 @@ export function AdminBrandingSettings() {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                  Answer
+                  Vastus
                   <textarea
                     rows={3}
                     value={item.answer}
@@ -1145,20 +1144,20 @@ export function AdminBrandingSettings() {
             onClick={() =>
               updateFaqItems([
                 ...settings.homepage.faq.items,
-                { question: "New question", answer: "" },
+                { question: "Uus küsimus", answer: "" },
               ])
             }
             className={actionButtonClass}
           >
-            Add FAQ
+            Lisa KKK
           </button>
         </div>
       </Section>
 
-      <Section title="Store page">
+      <Section title="Poe leht">
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Store page title
+            Poe lehe pealkiri
             <input
               type="text"
               value={settings.storePageTitle}
@@ -1169,7 +1168,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Store page description
+            Poe lehe kirjeldus
             <textarea
               rows={4}
               value={settings.storePageDescription}
@@ -1185,7 +1184,7 @@ export function AdminBrandingSettings() {
         </div>
       </Section>
 
-      <Section title="Top banner">
+      <Section title="Ülemine teavitusriba">
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/70 px-4 py-3 text-sm font-medium text-zinc-300 lg:col-span-2">
             <input
@@ -1198,10 +1197,10 @@ export function AdminBrandingSettings() {
                 }))
               }
             />
-            Show top banner
+            Näita ülemist teavitusriba
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Banner CTA label
+            Riba nupu tekst
             <input
               type="text"
               value={settings.topBannerCtaLabel}
@@ -1212,7 +1211,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Banner CTA URL
+            Riba nupu link (URL)
             <input
               type="url"
               value={settings.topBannerCtaUrl}
@@ -1223,7 +1222,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Banner messages
+            Teavitusriba sõnumid
             <textarea
               rows={6}
               value={stepsToText(settings.topBannerMessages)}
@@ -1234,16 +1233,16 @@ export function AdminBrandingSettings() {
                 }))
               }
               className={inputClass}
-              placeholder="One banner message per line"
+              placeholder="Üks sõnum rea kohta"
             />
           </label>
         </div>
       </Section>
 
-      <Section title="Footer content">
+      <Section title="Jaluse (Footer) sisu">
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Footer badge label
+            Jaluse sildi tekst
             <input
               type="text"
               value={settings.footerBadgeLabel}
@@ -1254,7 +1253,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Footer tagline
+            Jaluse hüüdlause
             <input
               type="text"
               value={settings.footerTagline}
@@ -1265,9 +1264,9 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Footer description
+            Jaluse kirjeldus
             <textarea
-              rows={4}
+              rows={3}
               value={settings.footerText}
               onChange={(event) =>
                 setSettings((current) => ({ ...current, footerText: event.target.value }))
@@ -1276,18 +1275,21 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Footer nav heading
+            Jaluse navigatsiooni pealkiri
             <input
               type="text"
               value={settings.footerNavHeading}
               onChange={(event) =>
-                setSettings((current) => ({ ...current, footerNavHeading: event.target.value }))
+                setSettings((current) => ({
+                  ...current,
+                  footerNavHeading: event.target.value,
+                }))
               }
               className={inputClass}
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Footer connect heading
+            Jaluse ühenduse pealkiri
             <input
               type="text"
               value={settings.footerConnectHeading}
@@ -1301,7 +1303,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Discord card title
+            Discordi kaardi pealkiri
             <input
               type="text"
               value={settings.footerDiscordCardTitle}
@@ -1315,7 +1317,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Discord button text
+            Discordi nupu tekst
             <input
               type="text"
               value={settings.footerConnectButtonText}
@@ -1329,7 +1331,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Discord blurb
+            Discordi lühikirjeldus
             <textarea
               rows={3}
               value={settings.footerConnectBlurb}
@@ -1343,7 +1345,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-            Footer copyright note
+            Autoriõiguse märge
             <input
               type="text"
               value={settings.footerCopyrightNote}
@@ -1357,7 +1359,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Bottom tagline left
+            Alariba vasak hüüdlause
             <input
               type="text"
               value={settings.footerBottomTaglineLeft}
@@ -1371,7 +1373,7 @@ export function AdminBrandingSettings() {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-            Bottom tagline right
+            Alariba parem hüüdlause
             <input
               type="text"
               value={settings.footerBottomTaglineRight}
@@ -1387,9 +1389,9 @@ export function AdminBrandingSettings() {
         </div>
       </Section>
 
-      <Section title="System">
+      <Section title="Süsteem">
         <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-          Logs webhook URL (optional)
+          Logide Webhook URL (valikuline)
           <input
             type="url"
             value={settings.logsWebhookUrl ?? ""}
@@ -1404,18 +1406,22 @@ export function AdminBrandingSettings() {
         </label>
       </Section>
 
-      <Section title="Discord DM templates">
+      <Section title="Discordi privaatsõnumite (DM) mallid">
         <div className="space-y-6">
           {(["whitelist", "job", "staff"] as const).map((applicationType) => (
             <div key={applicationType} className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
-              <h4 className="text-base font-semibold capitalize text-zinc-200">{applicationType}</h4>
+              <h4 className="text-base font-semibold capitalize text-zinc-200">
+                {applicationType === "whitelist" ? "Whitelist" : applicationType === "job" ? "Töökohad" : "Meeskond"}
+              </h4>
               {(["accepted", "rejected"] as const).map((status) => (
                 <div key={`${applicationType}-${status}`} className="grid gap-4 lg:grid-cols-2">
                   <div className="lg:col-span-2">
-                    <h5 className="text-sm font-semibold capitalize text-zinc-300">{status}</h5>
+                    <h5 className="text-sm font-semibold capitalize text-zinc-300">
+                      {status === "accepted" ? "Kinnitatud" : "Tagasi lükatud"}
+                    </h5>
                   </div>
                   <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                    Default reason
+                    Vaikimisi põhjus
                     <textarea
                       rows={4}
                       value={settings.dmTemplates[applicationType][status].reasonDefault}
@@ -1438,7 +1444,7 @@ export function AdminBrandingSettings() {
                     />
                   </label>
                   <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                    Footer note
+                    Jaluse märkus
                     <textarea
                       rows={4}
                       value={settings.dmTemplates[applicationType][status].footerNote}
@@ -1461,7 +1467,7 @@ export function AdminBrandingSettings() {
                     />
                   </label>
                   <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-                    Next steps
+                    Järgmised sammud
                     <textarea
                       rows={4}
                       value={stepsToText(settings.dmTemplates[applicationType][status].nextSteps)}
@@ -1481,7 +1487,7 @@ export function AdminBrandingSettings() {
                         }))
                       }
                       className={inputClass}
-                      placeholder="One next step per line"
+                      placeholder="Üks samm rea kohta"
                     />
                   </label>
                 </div>
@@ -1489,10 +1495,10 @@ export function AdminBrandingSettings() {
               {applicationType === "whitelist" && settings.dmTemplates.whitelist.deviceCheck ? (
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="lg:col-span-2">
-                    <h5 className="text-sm font-semibold text-zinc-300">Device check</h5>
+                    <h5 className="text-sm font-semibold text-zinc-300">Seadmekontroll (Device Check)</h5>
                   </div>
                   <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                    Default reason
+                    Vaikimisi põhjus
                     <textarea
                       rows={4}
                       value={settings.dmTemplates.whitelist.deviceCheck.reasonDefault}
@@ -1503,10 +1509,12 @@ export function AdminBrandingSettings() {
                             ...current.dmTemplates,
                             whitelist: {
                               ...current.dmTemplates.whitelist,
-                              deviceCheck: {
-                                ...current.dmTemplates.whitelist.deviceCheck!,
-                                reasonDefault: event.target.value,
-                              },
+                              deviceCheck: current.dmTemplates.whitelist.deviceCheck
+                                ? {
+                                    ...current.dmTemplates.whitelist.deviceCheck,
+                                    reasonDefault: event.target.value,
+                                  }
+                                : undefined,
                             },
                           },
                         }))
@@ -1515,7 +1523,7 @@ export function AdminBrandingSettings() {
                     />
                   </label>
                   <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300">
-                    Footer note
+                    Jaluse märkus
                     <textarea
                       rows={4}
                       value={settings.dmTemplates.whitelist.deviceCheck.footerNote}
@@ -1526,10 +1534,12 @@ export function AdminBrandingSettings() {
                             ...current.dmTemplates,
                             whitelist: {
                               ...current.dmTemplates.whitelist,
-                              deviceCheck: {
-                                ...current.dmTemplates.whitelist.deviceCheck!,
-                                footerNote: event.target.value,
-                              },
+                              deviceCheck: current.dmTemplates.whitelist.deviceCheck
+                                ? {
+                                    ...current.dmTemplates.whitelist.deviceCheck,
+                                    footerNote: event.target.value,
+                                  }
+                                : undefined,
                             },
                           },
                         }))
@@ -1538,7 +1548,7 @@ export function AdminBrandingSettings() {
                     />
                   </label>
                   <label className="flex flex-col gap-2 text-sm font-medium text-zinc-300 lg:col-span-2">
-                    Next steps
+                    Järgmised sammud
                     <textarea
                       rows={4}
                       value={stepsToText(settings.dmTemplates.whitelist.deviceCheck.nextSteps)}
@@ -1549,16 +1559,18 @@ export function AdminBrandingSettings() {
                             ...current.dmTemplates,
                             whitelist: {
                               ...current.dmTemplates.whitelist,
-                              deviceCheck: {
-                                ...current.dmTemplates.whitelist.deviceCheck!,
-                                nextSteps: textToSteps(event.target.value),
-                              },
+                              deviceCheck: current.dmTemplates.whitelist.deviceCheck
+                                ? {
+                                    ...current.dmTemplates.whitelist.deviceCheck,
+                                    nextSteps: textToSteps(event.target.value),
+                                  }
+                                : undefined,
                             },
                           },
                         }))
                       }
                       className={inputClass}
-                      placeholder="One next step per line"
+                      placeholder="Üks samm rea kohta"
                     />
                   </label>
                 </div>
@@ -1568,7 +1580,7 @@ export function AdminBrandingSettings() {
         </div>
       </Section>
 
-      <Section title="Logo upload" description="Stored directly in the database for simplicity.">
+      <Section title="Logo üleslaadimine" description="Salvestatakse lihtsuse huvides otse andmebaasi.">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex w-full flex-col gap-3 lg:max-w-sm">
             <input
@@ -1581,7 +1593,7 @@ export function AdminBrandingSettings() {
               <div className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-4">
                 <img
                   src={settings.logoDataUrl}
-                  alt="Logo preview"
+                  alt="Logo eelvaade"
                   className="mx-auto h-20 w-20 rounded-xl object-cover"
                   width={80}
                   height={80}
@@ -1591,12 +1603,12 @@ export function AdminBrandingSettings() {
                   onClick={() => setSettings((current) => ({ ...current, logoDataUrl: null }))}
                   className="mt-3 w-full rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800"
                 >
-                  Remove logo
+                  Eemalda logo
                 </button>
               </div>
             ) : (
               <div className="rounded-xl border border-dashed border-zinc-700 bg-zinc-950/50 px-4 py-6 text-center text-sm text-zinc-500">
-                No custom logo uploaded yet.
+                Kohandatud logo pole veel üles laetud.
               </div>
             )}
           </div>
@@ -1608,7 +1620,7 @@ export function AdminBrandingSettings() {
         disabled={saving}
         className="brand-bg w-full rounded-lg px-4 py-3 text-sm font-semibold transition brand-bg-hover disabled:opacity-50 sm:w-auto"
       >
-        {saving ? "Saving..." : "Save settings"}
+        {saving ? "Salvestan..." : "Salvesta seaded"}
       </button>
     </form>
   );
