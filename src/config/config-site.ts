@@ -27,22 +27,22 @@ export type DmApplicationTemplate = {
 const CONFIG_SITE = {
   // ─── Site & branding ─────────────────────────────────────────────────────
   /** Display name of the server (DMs, footer, branding) */
-  serverName: " Streets of San Andreas",
+  serverName: "Streets of San Andreas",
 
   /** Site name shown in the header */
-  siteName: "Streets of San Andreas" ,
+  siteName: "Streets of San Andreas",
 
   /** Icon or short label next to site name in header */
   headerIcon: "RP",
 
   /** Nav label for the whitelist link (e.g. "Get Whitelisted") */
-  whitelistNavLabel: "Get Whitelisted",
+  whitelistNavLabel: "Taotle Whitelisti",
 
   /** Nav label for the public store page */
-  storeNavLabel: "Store",
+  storeNavLabel: "Pood",
 
   /** Public Discord invite URL (footer "Connect" button and links) */
-  discordInviteUrl: "https://discord.gg/RDJtJb77X",
+  discordInviteUrl: "https://discord.gg",
 
   /** Discord server ID for the footer widget iframe (leave empty "" to hide the widget) */
   discordWidgetServerId: "1251722749819359272",
@@ -52,169 +52,168 @@ const CONFIG_SITE = {
     "Tere tulemast Streets of San Andreas RP serverisse! Liitu meie Discordiga, täida whitelist-avaldus ja alusta oma lugu.",
 
   /** Store page title */
-  storePageTitle: "Server Store",
+  storePageTitle: "Serveri Pood",
 
   /** Store page description */
   storePageDescription:
-    "Browse all items available for sale on the server. Admins can manage categories, prices, product titles, and images from the admin panel.",
+    "Sirvi kõiki serveris müüdavaid tooteid. Administraatorid saavad admin-paneelist hallata kategooriaid, hindu, tootenimesid ja pilte.",
 
   // ─── Top banner / ad bar ────────────────────────────────────────────────────
   /** Show the promotional banner at the very top of the site */
   topBannerEnabled: true,
   /** Label for the banner button (set empty string "" to hide the button) */
-  topBannerCtaLabel: "Server Store",
+  topBannerCtaLabel: "Serveri Pood",
   /** URL opened when clicking the banner button (falls back to discordInviteUrl if empty) */
-  topBannerCtaUrl: "https://tshentro.tebex.io",
+  topBannerCtaUrl: "https://tebex.io",
   /** Optional: cycle through multiple banner messages */
   topBannerMessages: ["Streets of San Andreas RP on nüüd avatud — liitu linnaga juba täna!"],
 
-
   // ─── Footer ───────────────────────────────────────────────────────────────
-  /** Small badge text above tagline (e.g.  or your brand) */
-  footerBadgeLabel: "t̴s̴h̶e̷n̶t̵r̵o̴.̴t̵e̷c̵h",
+  /** Small badge text above tagline (e.g. or your brand) */
+  footerBadgeLabel: "STREETS OF SAN ANDREAS",
 
   /** Uppercase tagline under the badge */
-  footerTagline: "FROM THE STREETS TO THE GENERATIONS",
+  footerTagline: "TÄNAVATELT PÕLVKONDADENI",
 
   /** Short description paragraph in the footer */
   footerDescription:
-    "Experience immersive GTA V roleplay with custom systems, serious RP, and a tight-knit community.",
+    "Koge kaasahaaravat GTA V rollimängu unikaalsete süsteemide, tõsise RP ja ühtehoidva kogukonnaga.",
 
   /** Discord connect card: button text */
-  footerConnectButtonText: "Connect to Discord",
+  footerConnectButtonText: "Liitu Discordiga",
 
   /** Discord connect card: short line above button (use {serverName} for server name) */
   footerConnectBlurb:
-    "Join {serverName} on Discord to get whitelisted, ask questions, and stay updated.",
+    "Liitu {serverName} Discordiga, et saada whitelist, küsida küsimusi ja olla kursis uuendustega.",
 
   /** Copyright line: "Not affiliated with …" */
-  footerCopyrightNote: "Not affiliated with Rockstar Games or Take-Two Interactive.",
+  footerCopyrightNote: "Ei ole seotud ettevõtetega Rockstar Games ega Take-Two Interactive.",
 
   /** Bottom bar left tagline (e.g. "RESPECT THE STREETS") */
-  footerBottomTaglineLeft: "RESPECT THE STREETS",
+  footerBottomTaglineLeft: "AUSTA TÄNAVAID",
 
   /** Bottom bar right tagline (e.g. "ROLEPLAY • COMMUNITY • STORIES") */
-  footerBottomTaglineRight: "ROLEPLAY • COMMUNITY • STORIES",
+  footerBottomTaglineRight: "ROLLIMÄNG • KOGUKOND • LOOD",
 
   /** Section heading for footer nav column */
-  footerNavHeading: "NAVIGATION",
+  footerNavHeading: "NAVIGATSIOON",
 
   /** Section heading for footer Discord card */
-  footerConnectHeading: "CONNECT",
+  footerConnectHeading: "ÜHENDU",
 
   /** Discord card inner title (e.g. "DISCORD") */
   footerDiscordCardTitle: "DISCORD",
 
   // ─── Discord DM (author & templates) ──────────────────────────────────────
   /** Author name on Discord DM embeds (optional; falls back to serverName) */
-  discordDmAuthorName: "𝑹𝑷",
+  discordDmAuthorName: "Streets of San Andreas RP",
 
   /** Discord DM templates for accepted/rejected messages (whitelist, job, staff) */
   dmTemplates: {
     whitelist: {
       accepted: {
         reasonDefault:
-          "Your answers showed a solid grasp of roleplay and fit what we're looking for. Looking forward to seeing you in-game.",
+          "Sinu vastused näitasid head arusaama rollimängust ja sobivad sellega, mida me otsime. Kohtumiseni mängus!",
         nextSteps: [
-          "Hop into our Discord if you're not in yet",
-          "Check #server-rules and get familiar with the guidelines",
-          "Connect with your whitelisted account when you're ready",
+          "Liitu meie Discordiga, kui sa pole veel seal",
+          "Tutvu #reeglid kanaliga ja loe juhised läbi",
+          "Ühendu serveriga oma whitelistitud kontoga, kui oled valmis",
         ],
-        footerNote: "Read the rules before you jump in. Need help? Ask any staff member.",
+        footerNote: "Loe enne mängu sisenemist reeglid läbi. Vajad abi? Küsi julgelt meeskonnalt.",
       },
       rejected: {
         reasonDefault:
-          "We couldn't approve it right now. Give our rules and guidelines another look; you're welcome to reapply when you're ready.",
+          "Kahjuks ei saanud me sinu avaldust praegu kinnitada. Vaata meie reeglid ja juhised uuesti üle ning oled oodatud uuesti kandideerima, kui oled valmis.",
         nextSteps: [
-          "Review our server rules and community guidelines",
-          "Apply again when you feel ready",
-          "Questions? Message our staff on Discord",
+          "Vaata uuesti üle meie serveri reeglid ja kogukonna juhised",
+          "Esita uus avaldus, kui tunned, et oled valmis",
+          "Küsimuste korral kirjuta meie meeskonnale Discordis",
         ],
-        footerNote: "Thanks for your interest. We hope to see you apply again.",
+        footerNote: "Täname huvi eest! Loodame, et kandideerid peagi uuesti.",
       },
       deviceCheck: {
         reasonDefault:
-          "Hello, we're waiting for you. We'll check your device before you enter the server. This is a daily routine and a security protocol specific to the server.",
+          "Tere, ootame sind! Kontrollime enne serverisse sisenemist sinu seadet. See on igapäevane rutiin ja serveri turvaprotokoll.",
         nextSteps: [
-          "Wait for a staff member to contact you",
-          "Make sure you are available on Discord for the device check",
-          "Once the check is done, we will continue your access process",
+          "Oota, kuni meeskonnaliige sinuga ühendust võtab",
+          "Ole Discordis seadmekontrolliks kättesaadav",
+          "Kui kontroll on tehtud, jätkame sinu ligipääsu kinnitamisega",
         ],
-        footerNote: "This device check is part of our normal daily server security routine.",
+        footerNote: "See seadmekontroll on osa meie tavapärasest serveri turvarutiinist.",
       },
     },
     job: {
       accepted: {
         reasonDefault:
-          "Your application was a good fit for the role. Get in touch with your supervisor for the next steps.",
+          "Sinu avaldus sobis sellele ametikohale suurepäraselt. Edasiste sammude jaoks võta ühendust oma ülemusega.",
         nextSteps: [
-          "Join our Discord if you aren't already in",
-          "Check #city-jobs or staff channels for details",
-          "Connect in-game and report to your supervisor as directed",
+          "Liitu meie Discordiga, kui sa pole veel liitunud",
+          "Vaata lisainfot töökoha või meeskonna kanalitest",
+          "Ühendu mängu ja anna endast ülemusele märku",
         ],
-        footerNote: "Questions about the role? Staff can point you in the right direction.",
+        footerNote: "Küsimusi ameti kohta? Meeskond aitab sind õigesse suunda juhatada.",
       },
       rejected: {
         reasonDefault:
-          "We're not moving forward with this one right now. You can try other openings or reapply later.",
+          "Me ei liigu selle avaldusega praegu edasi. Võid proovida teisi vabu töökohti või kandideerida hiljem uuesti.",
         nextSteps: [
-          "Look at other jobs on the site",
-          "Reapply when new positions open up",
-          "Reach out to staff on Discord if you have questions",
+          "Vaata teisi vabu töökohti meie veebilehel",
+          "Kandideeri uuesti, kui avanevad uued kohad",
+          "Küsimuste korral võta Discordis meeskonnaga ühendust",
         ],
-        footerNote: "Thanks for applying. Best of luck.",
+        footerNote: "Täname kandideerimast ja soovime edu!",
       },
     },
     staff: {
       accepted: {
         reasonDefault:
-          "What you brought to the table fits what we need. A team lead will get you set up.",
+          "Sinu oskused ja kogemused sobivad täpselt sellega, mida vajame. Meeskonnajuht võtab sinuga peagi ühendust.",
         nextSteps: [
-          "Get in our Discord if you're not already",
-          "Read staff guidelines and rules in the right channels",
-          "A team lead will contact you with your role and onboarding",
+          "Liitu meie Discordiga, kui sa pole veel seal",
+          "Loe läbi meeskonna juhised ja reeglid vastavates kanalites",
+          "Meeskonnajuht võtab sinuga ühendust, et anda õigused ja juhised",
         ],
         footerNote:
-          "Stuck on something? Your team lead or senior staff can help. See you on the team.",
+          "Jäid millegagi hätta? Meeskonnajuht või vanemliikmed aitavad alati. Kohtumiseni tiimis!",
       },
       rejected: {
         reasonDefault:
-          "We're not approving it right now. You can reapply later if things change.",
+          "Me ei saa sinu avaldust praegu kinnitada. Võid hiljem uuesti kandideerida, kui olukord muutub.",
         nextSteps: [
-          "Have another look at our server and staff guidelines",
-          "You can submit a new staff application when you're ready",
-          "Questions? Hit up our staff on Discord",
+          "Tutvu uuesti meie serveri ja meeskonna juhistega",
+          "Võid esitada uue meeskonna avalduse, kui oled valmis",
+          "Küsimuste korral kirjuta meeskonnale Discordis",
         ],
-        footerNote: "Thanks for wanting to help out. We appreciate it.",
+        footerNote: "Täname, et soovid panustada ja aidata. Hindame seda väga!",
       },
     },
   } as const satisfies Record<string, DmApplicationTemplate>,
 
   // ─── Whitelist application form questions ─────────────────────────────────
   whitelistApplicationQuestions: [
-    { id: "inGameName", label: "Your in-game name", type: "text" as const, required: true, placeholder: "Your character name" },
-    { id: "age", label: "Your age", type: "number" as const, required: true, placeholder: "18" },
-    { id: "timezone", label: "Discord ID", type: "text" as const, required: true, placeholder: "Discord ID" },
-    { id: "experience", label: "Why do you want to play on Highlife?", type: "textarea" as const, required: true, placeholder: "Explain why you want to play on Highlife" },
-    { id: "motivation", label: "Who told you about Highlife?", type: "textarea" as const, required: true, placeholder: "Example: I heard about Highlife because it's one of the best servers in Tunisia" },
-    { id: "characterStory", label: "How long have you been playing RP?", type: "textarea" as const, required: true, placeholder: "How long have you been playing RP, and what made you start?" },
-    { id: "additionalInfo", label: "Did you read and memorize the rules?", type: "textarea" as const, required: false, placeholder: "Example: Yes, I memorized them / No, not yet" },
+    { id: "inGameName", label: "Sinu tegelase nimi mängus", type: "text" as const, required: true, placeholder: "Tegelase ees- ja perekonnanimi" },
+    { id: "age", label: "Sinu vanus", type: "number" as const, required: true, placeholder: "18" },
+    { id: "timezone", label: "Discord ID", type: "text" as const, required: true, placeholder: "Sinu Discord ID" },
+    { id: "experience", label: "Miks soovid mängida Streets of San Andreas RP serveris?", type: "textarea" as const, required: true, placeholder: "Selgita, miks soovid just meie serveris mängida" },
+    { id: "motivation", label: "Kust kuulsid Streets of San Andreas RP kohta?", type: "textarea" as const, required: true, placeholder: "Nt: Kuulsin sõbralt või nägin TikTokis/Discordis" },
+    { id: "characterStory", label: "Kui kaua oled rollimängu (RP) mänginud?", type: "textarea" as const, required: true, placeholder: "Kui kaua oled RP-d mänginud ja mis pani sind alustama?" },
+    { id: "additionalInfo", label: "Kas oled serveri reeglid läbi lugenud ja selgeks õppinud?", type: "textarea" as const, required: false, placeholder: "Nt: Jah, olen läbi lugenud ja selgeks õppinud" },
   ] as const,
 
   // ─── City businesses (jobs list) ───────────────────────────────────────────
   businesses: [
-    { id: "hospital", name: "Pillbox Medical Center", category: "MEDICAL", description: "Hospital and EMS" },
-    { id: "lspd", name: "LSPD", category: "EMERGENCY SERVICES", description: "Law enforcement" },
+    { id: "hospital", name: "Pillboxi Meditsiinikeskus", category: "MEDITSIIN", description: "Haigla ja kiirabi (EMS)" },
+    { id: "lspd", name: "LSPD", category: "PÄÄSTETEENISTUSED", description: "Politsei ja korrakaitse" },
   ] as const,
 
   // ─── Staff application form questions ──────────────────────────────────────
   staffApplicationQuestions: [
-    { id: "role", label: "What made you want to join the Highlife staff team?", type: "select" as const, required: true, options: ["Support", "Development", "PARTNERSHIP"] },
-    { id: "age", label: "Age", type: "text" as const, required: true, placeholder: "e.g. 18" },
-    { id: "experience", label: "Do you have previous staff experience?", type: "textarea" as const, required: false },
-    { id: "availability", label: "How many hours can you be active as staff per day?", type: "text" as const, required: true },
-    { id: "why", label: "If you have previous staff experience, tell us where exactly", type: "textarea" as const, required: true },
-    { id: "additional", label: "If you become staff with us, what would your goal be?", type: "textarea" as const, required: false },
+    { id: "role", label: "Mis pani sind tahtma liituda Streets of San Andreas meeskonnaga?", type: "select" as const, required: true, options: ["Tugi (Support)", "Arendus (Development)", "Partnerlus (Partnership)"] },
+    { id: "age", label: "Vanus", type: "text" as const, required: true, placeholder: "nt 18" },
+    { id: "experience", label: "Kas sul on varasemat meeskonnatöö (staff) kogemust?", type: "textarea" as const, required: false },
+    { id: "availability", label: "Mitu tundi päevas saad meeskonnaliikmena aktiivne olla?", type: "text" as const, required: true },
+    { id: "why", label: "Kui sul on varasemat kogemust, siis kus täpsemalt?", type: "textarea" as const, required: true },
+    { id: "additional", label: "Kui saad meie meeskonda, mis oleks sinu peamine eesmärk?", type: "textarea" as const, required: false },
   ] as const,
 } as const;
 
