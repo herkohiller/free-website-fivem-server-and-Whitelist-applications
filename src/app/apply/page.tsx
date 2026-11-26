@@ -22,7 +22,7 @@ export default function ApplyPage() {
   if (status === "loading" || !mounted) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-zinc-500">Loading...</p>
+        <p className="text-zinc-500">Laadimine...</p>
       </div>
     );
   }
@@ -33,7 +33,7 @@ export default function ApplyPage() {
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-2 text-2xl font-bold text-zinc-100">{branding.whitelistNavLabel}</h1>
       <p className="mb-8 text-zinc-400">
-        Fill out the form below to apply for whitelist. We&apos;ll review and notify you via Discord.
+        Täida allolev vorm, et taotleda whitelisti. Vaatame selle üle ja anname sulle Discordis teada.
       </p>
       <ApplicationForm />
     </div>
