@@ -42,34 +42,34 @@ export default async function CommunityPage() {
       <section className="relative overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950 px-6 py-10 sm:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(56,189,248,0.10),transparent_30%)]" />
         <div className="relative space-y-3 text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">Community</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">Kogukond</p>
           <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
-            Community <span className="brand-text">hub</span>
+            Kogukonna <span className="brand-text">keskus</span>
           </h1>
           <p className="mx-auto max-w-2xl text-sm text-zinc-400 sm:text-base">
-            Community activity, whitelist status, live server snapshot, and the official rulebook — everything you need
-            in one place.
+            Kogukonna aktiivsus, whitelisti staatus, serveri reaalajas ülevaade ja ametlikud reeglid — kõik vajalik
+            ühes kohas.
           </p>
         </div>
       </section>
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="Discord members" value={metrics.discordMembers} active />
-        <StatCard label="Online (FiveM)" value={metrics.playersOnline} />
+        <StatCard label="Discordi liikmeid" value={metrics.discordMembers} active />
+        <StatCard label="Mängus (FiveM)" value={metrics.playersOnline} />
         <StatCard label="Whitelist OK" value={metrics.whitelistApproved} />
-        <StatCard label="Profiles" value={metrics.registeredUsers} />
-        <StatCard label="Rule categories" value={metrics.ruleCategories} />
-        <StatCard label="Pending apps" value={metrics.pendingApplications} />
+        <StatCard label="Profiile" value={metrics.registeredUsers} />
+        <StatCard label="Reeglite kategooriaid" value={metrics.ruleCategories} />
+        <StatCard label="Ootel avaldusi" value={metrics.pendingApplications} />
       </section>
 
       <nav
         className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800/90 bg-zinc-950/40 px-4 py-3"
-        aria-label="Quick links"
+        aria-label="Kiirlingid"
       >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Quick links</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Kiirlingid</span>
         <span className="hidden h-4 w-px bg-zinc-700 sm:block" aria-hidden />
         <Link href="/rules" className="text-sm font-medium text-zinc-300 transition hover:text-[var(--accent)]">
-          Rules
+          Reeglid
         </Link>
         <span className="text-zinc-600">·</span>
         <Link
@@ -86,7 +86,7 @@ export default async function CommunityPage() {
         </Link>
         <span className="text-zinc-600">·</span>
         <Link href="/jobs" className="text-sm font-medium text-zinc-300 transition hover:text-[var(--accent)]">
-          Jobs
+          Töökohad
         </Link>
       </nav>
 
@@ -95,17 +95,17 @@ export default async function CommunityPage() {
 
         <section className="rounded-2xl border border-zinc-800 bg-zinc-900/35 p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] brand-text">Rules overview</h2>
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] brand-text">Reeglite ülevaade</h2>
             <Link
               href="/rules"
               className="text-xs font-semibold text-zinc-400 transition hover:text-[var(--accent)]"
             >
-              View all →
+              Vaata kõiki →
             </Link>
           </div>
           {rules.length === 0 ? (
             <p className="mt-4 text-base leading-relaxed text-zinc-500">
-              Rule categories will appear here once a full admin adds them under Admin → Rules.
+              Reeglite kategooriad ilmuvad siia, kui peakorraldaja need jaotises Admin → Reeglid lisab.
             </p>
           ) : (
             <ul className="mt-5 space-y-3">
@@ -117,7 +117,7 @@ export default async function CommunityPage() {
                   >
                     <span className="block text-xl font-bold tracking-tight text-white sm:text-2xl">{cat.title}</span>
                     <span className="mt-1.5 block text-base leading-snug text-zinc-400">
-                      {cat.sections.length} {cat.sections.length === 1 ? "section" : "sections"} — open the full rulebook for details.
+                      {cat.sections.length} {cat.sections.length === 1 ? "alamjaotis" : "alamjaotist"} — täpsemaks lugemiseks ava reeglistik.
                     </span>
                   </Link>
                 </li>
