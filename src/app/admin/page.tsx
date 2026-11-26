@@ -36,7 +36,7 @@ export default function AdminPage() {
   const canManageJobs = adminType === "jobs" || adminType === "full";
   const canManageStaff = adminType === "team" || adminType === "full";
   const canManageStoreCatalog = canManageStore(adminType);
-  const canManageMembers = adminType === "full"; // only ADMIN_DISCORD_IDS
+  const canManageMembers = adminType === "full";
   const canManageBranding = adminType === "full";
   const canManageRules = userCanManageRules(adminType);
   const canViewLogs = canViewAuditLogs(adminType);
@@ -90,7 +90,7 @@ export default function AdminPage() {
   if (status === "loading") {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-zinc-500">Loading...</p>
+        <p className="text-zinc-500">Laadimine...</p>
       </div>
     );
   }
@@ -98,32 +98,30 @@ export default function AdminPage() {
   const isAdmin = (session?.user as { isAdmin?: boolean } | undefined)?.isAdmin;
   const discordId = (session?.user as { discordId?: string } | undefined)?.discordId;
 
-  // Logged in but not admin: show why and how to fix
   if (session && !isAdmin) {
     return (
       <div className="mx-auto max-w-xl rounded-xl border border-amber-500/30 bg-amber-500/5 p-6">
-        <h2 className="mb-2 text-lg font-semibold text-amber-400">Admin access required</h2>
+        <h2 className="mb-2 text-lg font-semibold text-amber-400">Vajalik on administraatori ligipääs</h2>
         <p className="mb-3 text-sm text-zinc-300">
-          Your account is not in the admin list. To access the admin panel:
+          Sinu konto ei ole administraatorite nimekirjas. Admin-paneeli ligipääsuks:
         </p>
         <ol className="mb-4 list-inside list-decimal space-y-1 text-sm text-zinc-400">
-          <li>Ask an existing admin to add you from <strong>Admin → Manage members</strong> (no .env edit needed), or add your Discord ID to the server environment variables.</li>
+          <li>Palu olemasoleval peakorraldajal lisada sind jaotises <strong>Admin → Halda liikmeid</strong>, või lisa oma Discord ID serveri keskkonnamuutujatesse.</li>
           {discordId && (
             <li className="mt-2 rounded bg-zinc-800/80 px-2 py-1 font-mono text-amber-300">
-              Your Discord ID: <strong>{discordId}</strong>
+              Sinu Discord ID: <strong>{discordId}</strong>
             </li>
           )}
           <li>
-            Set <code className="rounded bg-zinc-800 px-1">ADMIN_DISCORD_IDS</code> (or{" "}
+            Määra <code className="rounded bg-zinc-800 px-1">ADMIN_DISCORD_IDS</code> (või{" "}
             <code className="rounded bg-zinc-800 px-1">TEAM_ADMIN_DISCORD_IDS</code> /{" "}
             <code className="rounded bg-zinc-800 px-1">JOBS_ADMIN_DISCORD_IDS</code> /{" "}
-            <code className="rounded bg-zinc-800 px-1">RULES_ADMIN_DISCORD_IDS</code>) in your .env
-            file or, on Vercel, in Project Settings → Environment Variables.
+            <code className="rounded bg-zinc-800 px-1">RULES_ADMIN_DISCORD_IDS</code>) Verceli projekti seadetes (Environment Variables).
           </li>
-          <li>Redeploy or restart the app, then sign out and sign in again.</li>
+          <li>Tee Redeploy, logi korra välja ja uuesti sisse.</li>
         </ol>
         <p className="text-xs text-zinc-500">
-          Redirecting you to the homepage in a few seconds…
+          Suuname sind mõne sekundi pärast avalehele…
         </p>
       </div>
     );
@@ -135,22 +133,21 @@ export default function AdminPage() {
     <div className="mx-auto max-w-5xl">
       <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Admin</h1>
       <p className="mb-2 text-zinc-600 dark:text-zinc-400">
-        {[canManageWhitelist && "whitelist", canManageJobs && "job", canManageStaff && "staff", canManageStoreCatalog && "store catalog", canManageForms && "forms", canManageBranding && "branding", canManageRules && "rules", canViewLogs && "logs"]
+        {[canManageWhitelist && "whitelist", canManageJobs && "töökohad", canManageStaff && "meeskond", canManageStoreCatalog && "poe kataloog", canManageForms && "vormid", canManageBranding && "bränding", canManageRules && "reeglid", canViewLogs && "logid"]
           .filter(Boolean)
           .join(", ")}
-        {" "}management.
+        {" "}— halduspaneel.
       </p>
       {!canManageStaff && (canManageWhitelist || canManageJobs) && (
         <p className="mb-6 text-xs text-amber-600/90 dark:text-amber-400/90">
-          To review <strong>staff</strong> applications, add your Discord ID to <code className="rounded bg-zinc-800 px-1">ADMIN_DISCORD_IDS</code> or <code className="rounded bg-zinc-800 px-1">TEAM_ADMIN_DISCORD_IDS</code> in .env, then sign in again.
+          Meeskonna avalduste ülevaatamiseks lisa oma Discord ID muutujasse <code className="rounded bg-zinc-800 px-1">ADMIN_DISCORD_IDS</code> või <code className="rounded bg-zinc-800 px-1">TEAM_ADMIN_DISCORD_IDS</code> ja logi uuesti sisse.
         </p>
       )}
       {canManageStaff && (
         <p className="mb-6 text-xs text-zinc-500">
-          Staff applications from /apply/staff appear in the <strong>Staff applications</strong> tab below.
+          Lehelt /apply/staff saadetud meeskonna avaldused ilmuvad allolevasse <strong>Meeskonna avaldused</strong> vahekaarti.
         </p>
       )}
-
       <div className="mb-4 grid gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-800 sm:flex sm:flex-wrap sm:pb-0">
         {canManageWhitelist && (
           <button
@@ -162,7 +159,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Whitelist (team)
+            Whitelist (tiim)
           </button>
         )}
         {canManageJobs && (
@@ -175,7 +172,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Jobs & city positions
+            Töökohad ja ametid
           </button>
         )}
         {canManageStaff && (
@@ -188,7 +185,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Staff applications
+            Meeskonna avaldused
           </button>
         )}
         {canManageStoreCatalog && (
@@ -201,7 +198,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Store catalog
+            Poe kataloog
           </button>
         )}
         {canManageMembers && (
@@ -214,7 +211,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Manage members
+            Halda liikmeid
           </button>
         )}
         {canManageBranding && (
@@ -227,7 +224,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Branding
+            Bränding ja välimus
           </button>
         )}
         {canManageRules && (
@@ -240,7 +237,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Rules
+            Reeglid
           </button>
         )}
         {canManageForms && (
@@ -253,7 +250,7 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Forms
+            Vormid ja küsimused
           </button>
         )}
         {canViewLogs && (
@@ -266,31 +263,31 @@ export default function AdminPage() {
                 : "border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:hover:text-zinc-300"
             }`}
           >
-            Logs
+            Logid
           </button>
         )}
       </div>
       <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-500">
-        Viewing: <strong className="text-zinc-600 dark:text-zinc-400">
+        Vaade: <strong className="text-zinc-600 dark:text-zinc-400">
           {activeTab === "whitelist"
-            ? "Whitelist (team)"
+            ? "Whitelist (tiim)"
             : activeTab === "jobs"
-              ? "Jobs & city positions"
+              ? "Töökohad ja ametid"
               : activeTab === "staff"
-                ? "Staff applications"
+                ? "Meeskonna avaldused"
                 : activeTab === "store"
-                  ? "Store catalog"
+                  ? "Poe kataloog"
                   : activeTab === "members"
-                    ? "Manage members"
+                    ? "Halda liikmeid"
                     : activeTab === "branding"
-                      ? "Branding"
+                      ? "Bränding ja välimus"
                       : activeTab === "rules"
-                        ? "Rules"
+                        ? "Reeglid"
                         : activeTab === "forms"
-                          ? "Forms"
-                          : "Logs"}
+                          ? "Vormid ja küsimused"
+                          : "Logid"}
         </strong>
-        {activeTab !== "staff" && canManageStaff && activeTab !== "members" && activeTab !== "store" && " — Staff applications are in the tab above."}
+        {activeTab !== "staff" && canManageStaff && activeTab !== "members" && activeTab !== "store" && " — Meeskonna avaldused leiad ülalolevalt vahekaardilt."}
       </p>
 
       {activeTab === "whitelist" && <AdminApplicationList />}
