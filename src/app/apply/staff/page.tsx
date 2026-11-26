@@ -30,7 +30,7 @@ export default function ApplyStaffPage() {
 
     fetch("/api/form-questions?formType=staff")
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to load questions");
+        if (!res.ok) throw new Error("Küsimuste laadimine ebaõnnestus");
         return res.json();
       })
       .then((data) => {
@@ -44,7 +44,7 @@ export default function ApplyStaffPage() {
           return next;
         });
       })
-      .catch(() => setError("Failed to load staff questions."))
+      .catch(() => setError("Meeskonna küsimuste laadimine ebaõnnestus."))
       .finally(() => setQuestionsLoading(false));
   }, [mounted]);
 
@@ -60,12 +60,12 @@ export default function ApplyStaffPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to submit");
+        throw new Error(data.error || "Esitamine ebaõnnestus");
       }
-      toast.addToast("Staff application submitted. We'll review it soon.", "success");
+      toast.addToast("Meeskonna avaldus on esitatud! Vaatame selle peagi üle.", "success");
       setTimeout(() => router.push("/applications?tab=staff"), 1000);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong";
+      const msg = err instanceof Error ? err.message : "Midagi läks valesti";
       setError(msg);
       toast.addToast(msg, "error");
     } finally {
@@ -76,7 +76,7 @@ export default function ApplyStaffPage() {
   if (status === "loading" || !mounted) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-zinc-500">Loading...</p>
+        <p className="text-zinc-500">Laadimine...</p>
       </div>
     );
   }
@@ -85,16 +85,16 @@ export default function ApplyStaffPage() {
   if (questionsLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-zinc-500">Loading questions...</p>
+        <p className="text-zinc-500">Küsimuste laadimine...</p>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-2 text-2xl font-bold text-zinc-100">Staff application</h1>
+      <h1 className="mb-2 text-2xl font-bold text-zinc-100">Meeskonna avaldus</h1>
       <p className="mb-8 text-zinc-400">
-        Apply to join the {branding.serverName} staff team. We&apos;ll review and get back to you.
+        Kandideeri {branding.serverName} meeskonda. Vaatame sinu avalduse üle ja võtame sinuga ühendust.
       </p>
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
@@ -117,7 +117,7 @@ export default function ApplyStaffPage() {
                 value={answers[q.questionKey] ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, [q.questionKey]: e.target.value }))}
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-base text-zinc-100 placeholder-zinc-500 focus:border-[var(--accent)] focus:outline-none"
-                placeholder={q.placeholder ?? "Your answer..."}
+                placeholder={q.placeholder ?? "Sinu vastus..."}
               />
             ) : q.type === "select" ? (
               <select
@@ -128,7 +128,7 @@ export default function ApplyStaffPage() {
                 onChange={(e) => setAnswers((a) => ({ ...a, [q.questionKey]: e.target.value }))}
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-base text-zinc-100 focus:border-[var(--accent)] focus:outline-none"
               >
-                <option value="">{q.placeholder ?? "Select..."}</option>
+                <option value="">{q.placeholder ?? "Vali..."}</option>
                 {q.options.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt}
@@ -144,7 +144,7 @@ export default function ApplyStaffPage() {
                 value={answers[q.questionKey] ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, [q.questionKey]: e.target.value }))}
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-base text-zinc-100 placeholder-zinc-500 focus:border-[var(--accent)] focus:outline-none"
-                placeholder={q.placeholder ?? "Your answer..."}
+                placeholder={q.placeholder ?? "Sinu vastus..."}
               />
             )}
           </div>
@@ -154,7 +154,7 @@ export default function ApplyStaffPage() {
           disabled={loading}
           className="brand-bg w-full rounded-lg px-4 py-3 font-semibold transition brand-bg-hover disabled:opacity-50"
         >
-          {loading ? "Submitting..." : "Submit staff application"}
+          {loading ? "Saadan..." : "Esita meeskonna avaldus"}
         </button>
       </form>
     </div>
