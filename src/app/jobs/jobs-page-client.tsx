@@ -58,10 +58,10 @@ export function JobsPageClient({
       const res = await fetch(`/api/jobs/${jobId}/apply`, { method: "POST" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.addToast(data.error || "Failed to apply", "error");
+        toast.addToast(data.error || "Kandideerimine ebaõnnestus", "error");
         return;
       }
-      toast.addToast("Application submitted. We'll review it soon.", "success");
+      toast.addToast("Avaldus saadetud! Vaatame selle peagi üle.", "success");
       setTimeout(() => {
         window.location.href = "/applications?tab=jobs";
       }, 1200);
@@ -76,26 +76,26 @@ export function JobsPageClient({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(56,189,248,0.10),transparent_30%)]" />
         <div className="relative">
         <p className="brand-soft brand-text mb-3 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-widest">
-          Career Portal
+          Karjääriportaal
         </p>
         <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
-          Find Your Next Role In The City
+          Leia oma järgmine töökoht linnas
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
-          Explore active departments, compare starting pay bands, and submit your
-          in-game application in seconds with your Discord account.
+          Tutvu aktiivsete asutustega, võrdle algpalkasid ja esita oma
+          mängusisene tööavaldus sekunditega oma Discordi kontoga.
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
             <p className="text-xs uppercase tracking-wider text-slate-400">
-              Open Roles
+              Vabad töökohad
             </p>
             <p className="mt-1 text-2xl font-bold text-white">{totalJobs}</p>
           </div>
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
             <p className="text-xs uppercase tracking-wider text-slate-400">
-              Departments
+              Valdkonnad
             </p>
             <p className="mt-1 text-2xl font-bold text-white">{categories.length}</p>
           </div>
@@ -114,7 +114,7 @@ export function JobsPageClient({
                 : "border-slate-700 bg-slate-900/70 text-slate-300 hover:border-slate-500 hover:text-white"
             }`}
           >
-            <span>All Jobs</span>
+            <span>Kõik töökohad</span>
             <span className="rounded-full bg-black/20 px-2 py-0.5">{
               totalJobs
             }</span>
@@ -148,7 +148,7 @@ export function JobsPageClient({
                 <div>
                   <h3 className="text-lg font-bold text-white">{job.title}</h3>
                   <p className="text-xs uppercase tracking-wider text-slate-400">
-                    Starting {salaryDollars(job.salaryTier)}
+                    Algtase {salaryDollars(job.salaryTier)}
                   </p>
                 </div>
                 <span
@@ -180,14 +180,14 @@ export function JobsPageClient({
                   disabled={applyingId === job.id}
                   className="brand-bg rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {applyingId === job.id ? "Submitting..." : "Start Application"}
+                  {applyingId === job.id ? "Saadan..." : "Alusta kandideerimist"}
                 </button>
               ) : (
                 <Link
                   href="/api/auth/signin/discord?callbackUrl=/jobs"
                   className="rounded-xl border border-slate-600 bg-slate-800/70 px-4 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-rose-400/60 hover:text-white"
                 >
-                  Sign in with Discord
+                  Logi sisse Discordiga
                 </Link>
               )}
             </article>
@@ -198,8 +198,8 @@ export function JobsPageClient({
           <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-10 text-center">
             <p className="text-slate-300">
               {totalJobs === 0 && configHasJobs
-                ? "No jobs loaded yet. Ensure the database is set up (run migrations) and that the app can write to it."
-                : "No jobs found for this department yet."}
+                ? "Töökohti pole veel laaditud. Kontrolli andmebaasi ühendust."
+                : "Selles valdkonnas pole hetkel vabu töökohti."}
             </p>
           </div>
         )}
