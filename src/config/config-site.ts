@@ -60,7 +60,7 @@ const CONFIG_SITE = {
 
   // ─── Top banner / ad bar ────────────────────────────────────────────────────
   /** Show the promotional banner at the very top of the site */
-  topBannerEnabled: true,
+  topBannerEnabled: false,
   /** Label for the banner button (set empty string "" to hide the button) */
   topBannerCtaLabel: "Serveri Pood",
   /** URL opened when clicking the banner button (falls back to discordInviteUrl if empty) */
