@@ -7,11 +7,11 @@ export default function HomePage() {
   const { data: session, status } = useSession();
 
   return (
-    <main
-      className="relative flex min-h-screen flex-col items-center justify-center bg-cover bg-center bg-no-repeat px-4 text-center text-white"
+    <div
+      className="fixed inset-0 z-50 flex h-screen w-screen flex-col items-center justify-center bg-cover bg-center bg-no-repeat px-4 text-center text-white"
       style={{ backgroundImage: "url('/taust.png')" }}
     >
-      <div className="absolute inset-0 bg-black/65" />
+      <div className="absolute inset-0 bg-black/60" />
 
       <div className="relative z-10 max-w-4xl space-y-10">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
@@ -53,6 +53,6 @@ export default function HomePage() {
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
