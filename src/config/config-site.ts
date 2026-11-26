@@ -27,10 +27,10 @@ export type DmApplicationTemplate = {
 const CONFIG_SITE = {
   // ─── Site & branding ─────────────────────────────────────────────────────
   /** Display name of the server (DMs, footer, branding) */
-  serverName: " t̴s̴h̶e̷n̶t̵r̵o̴.̴t̵e̷c̵h",
+  serverName: " Streets of San Andreas",
 
   /** Site name shown in the header */
-  siteName: "t̴s̴h̶e̷n̶t̵r̵o̴.̴t̵e̷c̵h" ,
+  siteName: "Streets of San Andreas" ,
 
   /** Icon or short label next to site name in header */
   headerIcon: "RP",
@@ -42,14 +42,14 @@ const CONFIG_SITE = {
   storeNavLabel: "Store",
 
   /** Public Discord invite URL (footer "Connect" button and links) */
-  discordInviteUrl: "https://discord.gg/DWdM4h7xbj",
+  discordInviteUrl: "https://discord.gg/RDJtJb77X",
 
   /** Discord server ID for the footer widget iframe (leave empty "" to hide the widget) */
   discordWidgetServerId: "1251722749819359272",
 
   /** Homepage subtitle under the title (use {serverName} to insert the server name) */
   homepageSubtitle:
-    "Welcome to the first roleplay server in Tunisia created with no restrictions and no access privileges.We are proud to be the Tunisian RP server without a whitelist, open to everyone.Everyone can play. Everyone is welcome. Come and experience RP the easy way — welcome to our server! {serverName}.",
+    "Tere tulemast Streets of San Andreas RP serverisse! Liitu meie Discordiga, täida whitelist-avaldus ja alusta oma lugu.",
 
   /** Store page title */
   storePageTitle: "Server Store",
@@ -66,14 +66,8 @@ const CONFIG_SITE = {
   /** URL opened when clicking the banner button (falls back to discordInviteUrl if empty) */
   topBannerCtaUrl: "https://tshentro.tebex.io",
   /** Optional: cycle through multiple banner messages */
-  topBannerMessages: [
-    "Tunisia High-life RP is live now — join the city and start your story today.",
-    "Welcome to Tunisia High-life RP — where your story begins. The city is now live.",
-    "Your new life starts here. Tunisia High-life RP is now live — enter the city today.",
-    "High-life RP Tunisia is LIVE — are you ready?",
-    "A new city. A new life. Tunisia High-life RP is now live — your story begins now.",
-    "Step into Tunisia High-life RP — an exclusive roleplay experience now live.",
-  ],
+  topBannerMessages: ["Streets of San Andreas RP on nüüd avatud — liitu linnaga juba täna!"],
+
 
   // ─── Footer ───────────────────────────────────────────────────────────────
   /** Small badge text above tagline (e.g.  or your brand) */
