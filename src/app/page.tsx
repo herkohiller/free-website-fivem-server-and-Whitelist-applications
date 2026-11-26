@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <div
       className="fixed inset-0 z-50 flex h-screen w-screen flex-col items-center justify-center bg-cover bg-center bg-no-repeat px-4 text-center text-white"
-      style={{ backgroundImage: "url('/taust.png')" }}
+      style={{ backgroundImage: "url('/taust2.png')" }}
     >
       <div className="absolute inset-0 bg-black/60" />
 
