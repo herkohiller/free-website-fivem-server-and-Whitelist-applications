@@ -13,17 +13,16 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const publicLinks = [
-    { href: "/community", label: "Community" },
-    { href: "/rules", label: "Rules" },
-    { href: "/jobs", label: "Jobs" },
+    { href: "/community", label: "Kogukond" },
+    { href: "/rules", label: "Reeglid" },
     { href: "/store", label: branding.storeNavLabel },
   ];
 
   const signedInLinks = [
     ...publicLinks,
-    { href: "/applications", label: "My applications" },
+    { href: "/applications", label: "Minu avaldused" },
     { href: "/apply", label: branding.whitelistNavLabel },
-    { href: "/apply/staff", label: "Staff" },
+    { href: "/apply/staff", label: "Meeskond" },
     ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
@@ -59,9 +58,9 @@ export function Header() {
             onClick={() => setMobileOpen((current) => !current)}
             className="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800"
             aria-expanded={mobileOpen}
-            aria-label="Toggle navigation menu"
+            aria-label="Ava või sulge menüü"
           >
-            {mobileOpen ? "Close" : "Menu"}
+            {mobileOpen ? "Sulge" : "Menüü"}
           </button>
         </div>
 
@@ -71,10 +70,10 @@ export function Header() {
 
           <nav
             className="flex min-w-0 max-w-full shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-5 lg:gap-x-6"
-            aria-label="Main"
+            aria-label="Peamenüü"
           >
             {status === "loading" ? (
-              <span className="text-sm text-zinc-500">Loading…</span>
+              <span className="text-sm text-zinc-500">Laadimine…</span>
             ) : (
               navLinks.map((link) => (
                 <Link
@@ -108,7 +107,7 @@ export function Header() {
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="shrink-0 rounded-lg border border-zinc-600 bg-zinc-800/80 px-3 py-1.5 text-sm font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-700"
                 >
-                  Sign out
+                  Logi välja
                 </button>
               </>
             ) : (
@@ -116,7 +115,7 @@ export function Header() {
                 href="/api/auth/signin/discord"
                 className="shrink-0 rounded-lg bg-[#5865f2] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#4752c4]"
               >
-                Login with Discord
+                Logi sisse Discordiga
               </Link>
             )}
           </div>
@@ -124,7 +123,7 @@ export function Header() {
       </div>
       <div className={`border-t border-zinc-800 bg-zinc-950/95 px-4 py-4 md:hidden ${mobileOpen ? "block" : "hidden"}`}>
         {status === "loading" ? (
-          <span className="text-sm text-zinc-500">Loading…</span>
+          <span className="text-sm text-zinc-500">Laadimine…</span>
         ) : (
           <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
@@ -156,7 +155,7 @@ export function Header() {
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm font-semibold text-zinc-100 transition hover:bg-zinc-700"
                 >
-                  Sign out
+                  Logi välja
                 </button>
               </>
             ) : (
@@ -164,7 +163,7 @@ export function Header() {
                 href="/api/auth/signin/discord"
                 className="w-full rounded-lg bg-[#5865f2] px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#4752c4]"
               >
-                Login with Discord
+                Logi sisse Discordiga
               </Link>
             )}
           </div>
