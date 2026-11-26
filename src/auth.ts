@@ -54,15 +54,17 @@ export async function getAdminType(discordId: string): Promise<"team" | "jobs" |
 
 /** Auth config exported for use in route handler (GET signin with provider redirect) */
 export const authOptions = {
-  providers: [
-    Discord({
-      clientId: process.env.DISCORD_CLIENT_ID!,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-      authorization: {
-        params: { scope: "identify email" },
-      },
-    }),
-  ],
+providers: [
+  Discord({
+    clientId: process.env.DISCORD_CLIENT_ID!,
+    clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+    issuer: "https://discord.com",
+    authorization: {
+      params: { scope: "identify email" },
+    },
+  }),
+],
+
   callbacks: {
     async signIn({ user, account, profile }: { user: any; account: any; profile: any }) {
       if (!account?.providerAccountId) return true;
