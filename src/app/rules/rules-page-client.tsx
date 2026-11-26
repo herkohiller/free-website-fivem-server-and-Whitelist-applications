@@ -143,14 +143,13 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Page header — title + subtitle left, search right (reference layout) */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl md:text-[2.75rem] md:leading-[1.1]">
-            Server <span className="brand-text">rules</span>
+            Serveri <span className="brand-text">reeglid</span>
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-400 sm:text-lg">
-            Official rule list and community standards. Search by topic — RDM, metagaming, Discord, and more.
+            Ametlik reeglite nimekiri ja kogukonna standardid. Otsi teema järgi — RDM, metagaming, Discord ja muu.
           </p>
         </div>
         <div className="relative w-full shrink-0 lg:max-w-md">
@@ -161,7 +160,7 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search rules (e.g. RDM, meta, Discord…)"
+            placeholder="Otsi reegleid (nt RDM, meta, Discord…)"
             className="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-3 pl-10 pr-3 text-sm text-zinc-100 shadow-inner shadow-black/20 placeholder:text-zinc-600 focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/25"
           />
         </div>
@@ -169,25 +168,24 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
 
       {search.trim() && searchMatchesCategories && searchMatchesCategories.length === 0 ? (
         <p className="rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4 py-8 text-center text-sm text-zinc-500">
-          No rules match that search.
+          Otsingule vastavaid reegleid ei leitud.
         </p>
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,300px)_1fr] lg:gap-8">
-        {/* Sidebar — Kategoriler-style accordion */}
         <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
           <p className="flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] brand-text">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-800/90 bg-zinc-900/70 text-[var(--accent)]">
               <ListIcon />
             </span>
-            Categories
+            Kategooriad
           </p>
           <div className="rounded-2xl border border-zinc-800/90 bg-zinc-900/35 p-2.5 shadow-sm shadow-black/20">
             {categories.length === 0 ? (
               <p className="px-3 py-5 text-sm leading-relaxed text-zinc-500">
-                No rule categories yet. Full admins can add them in{" "}
+                Reeglite kategooriaid pole veel lisatud. Peakorraldajad saavad neid lisada jaotises{" "}
                 <Link href="/admin" className="brand-text underline-offset-2 hover:underline">
-                  Admin → Rules
+                  Admin → Reeglid
                 </Link>
                 .
               </p>
@@ -259,12 +257,10 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
             )}
           </div>
         </aside>
-
-        {/* Main — grid OR inline detail (reference: no modal) */}
         <section className="min-w-0 space-y-4">
           {!activeCategory ? (
             <div className="rounded-2xl border border-zinc-800/90 bg-zinc-900/25 p-8 text-center text-sm text-zinc-500">
-              Select a category to browse rules.
+              Vali vasakult kategooria, et reegleid sirvida.
             </div>
           ) : selectedSection ? (
             <div>
@@ -274,7 +270,7 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
                 className="mb-5 inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm font-medium text-zinc-400 transition hover:border-zinc-600 hover:bg-zinc-800/60 hover:text-zinc-200"
               >
                 <ArrowLeftIcon />
-                Subcategories
+                Alamkategooriad
               </button>
 
               <div className="mb-8 space-y-2">
@@ -296,7 +292,7 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
                 <div className="whitespace-pre-wrap text-lg leading-[1.75] text-zinc-200 sm:text-xl sm:leading-8">
                   {selectedSection.content.trim() || (
                     <span className="text-lg text-zinc-500 sm:text-xl">
-                      No content yet — admins can add text in Admin → Rules.
+                      Sisu puudub — administraatorid saavad teksti lisada jaotises Admin → Reeglid.
                     </span>
                   )}
                 </div>
@@ -305,12 +301,12 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
           ) : (
             <>
               <div className="flex items-center gap-2.5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] brand-text">Subcategories</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] brand-text">Alamkategooriad</p>
                 <span className="h-px flex-1 bg-gradient-to-r from-zinc-700/80 to-transparent" aria-hidden />
               </div>
               {filteredSections.length === 0 ? (
                 <p className="rounded-2xl border border-zinc-800/90 bg-zinc-900/25 py-10 text-center text-sm text-zinc-500">
-                  No sections in this category match your search.
+                  Selles kategoorias ei leitud otsingule vastavaid reegleid.
                 </p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -351,9 +347,9 @@ export function RulesPageClient({ initialCategories }: { initialCategories: Rule
       </div>
 
       <p className="text-center text-xs text-zinc-600">
-        Content is managed in the admin panel.{" "}
+        Sisu hallatakse admin-paneelis.{" "}
         <button type="button" onClick={() => void refresh()} className="brand-text hover:underline">
-          Refresh list
+          Värskenda nimekirja
         </button>
       </p>
     </div>
