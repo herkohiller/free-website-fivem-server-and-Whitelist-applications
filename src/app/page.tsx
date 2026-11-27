@@ -128,7 +128,6 @@ export default async function HomePage() {
   const session = await auth();
   const branding = await getBrandingSettings();
 
-  // Sisselogimata külastaja vaade
   if (!session?.user) {
     return (
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden bg-zinc-950 px-4 text-center text-white">
@@ -154,7 +153,6 @@ export default async function HomePage() {
     );
   }
 
-  // Sisselogitud kasutaja andmed
   const resolved = await resolveSessionUserId(session);
   const userId = resolved.ok ? resolved.userId : null;
 
@@ -224,7 +222,6 @@ export default async function HomePage() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-8 sm:py-8">
-      {/* TAUSTAPILT + KLAASJAS HAJUTUS */}
       <div
         className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20 blur-sm"
         style={{ backgroundImage: "url('/taust2.png')" }}
@@ -232,7 +229,6 @@ export default async function HomePage() {
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(244,63,94,0.12),_transparent_50%),radial-gradient(ellipse_at_bottom_left,_rgba(59,130,246,0.08),_transparent_50%)]" />
 
       <div className="relative z-10 mx-auto max-w-7xl space-y-6">
-        {/* ÜLEMINE KLAASJAS PÄIS */}
         <header className="flex flex-col justify-between gap-4 rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl sm:flex-row sm:items-center">
           <div className="flex items-center gap-4">
             {session.user.image ? (
@@ -278,11 +274,8 @@ export default async function HomePage() {
           </div>
         </header>
 
-        {/* BENTO-GRID PAIGUTUS */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* VASAK / KESKMINE OSA (8 VEERGU) */}
           <div className="space-y-6 lg:col-span-8">
-            {/* 1. KODANIKU PASS (SUUR BENTO KAART) */}
             <section className="rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -386,56 +379,6 @@ export default async function HomePage() {
               )}
             </section>
 
-            {/* 2. KIIRLINGID (4 BENTO RUUTU) */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <Link
-                href="/rules"
-                className="group rounded-3xl border border-white/10 bg-zinc-900/55 p-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-rose-500/40 hover:bg-zinc-900/80"
-              >
-                <p className="text-xs font-bold text-rose-400">01</p>
-                <p className="mt-2 text-sm font-bold text-white group-hover:text-rose-300">
-                  Serveri reeglid
-                </p>
-                <p className="mt-0.5 text-xs text-zinc-500">Tutvu enne mängu</p>
-              </Link>
-
-              <Link
-                href="/store"
-                className="group rounded-3xl border border-white/10 bg-zinc-900/55 p-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-rose-500/40 hover:bg-zinc-900/80"
-              >
-                <p className="text-xs font-bold text-rose-400">02</p>
-                <p className="mt-2 text-sm font-bold text-white group-hover:text-rose-300">
-                  Toetaja pood
-                </p>
-                <p className="mt-0.5 text-xs text-zinc-500">VIP ja lisad</p>
-              </Link>
-
-              <Link
-                href="/apply/staff"
-                className="group rounded-3xl border border-white/10 bg-zinc-900/55 p-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-rose-500/40 hover:bg-zinc-900/80"
-              >
-                <p className="text-xs font-bold text-rose-400">03</p>
-                <p className="mt-2 text-sm font-bold text-white group-hover:text-rose-300">
-                  Meeskond
-                </p>
-                <p className="mt-0.5 text-xs text-zinc-500">Liitu tiimiga</p>
-              </Link>
-
-              <Link
-                href="/applications"
-                className="group rounded-3xl border border-white/10 bg-zinc-900/55 p-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-rose-500/40 hover:bg-zinc-900/80"
-              >
-                <p className="text-xs font-bold text-rose-400">04</p>
-                <p className="mt-2 text-sm font-bold text-white group-hover:text-rose-300">
-                  Minu avaldused
-                </p>
-                <p className="mt-0.5 text-xs text-zinc-500">
-                  Kokku {userApplications.length + userStaffApplications.length} tk
-                </p>
-              </Link>
-            </div>
-
-            {/* 3. ESITATUD TAOTLUSED */}
             <section className="rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <div>
@@ -514,9 +457,7 @@ export default async function HomePage() {
             </section>
           </div>
 
-          {/* PAREM VEERG (4 VEERGU): SERVERI OLEK JA TOP 10 */}
           <div className="space-y-6 lg:col-span-4">
-            {/* SERVERI KAART */}
             <section className="rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
@@ -557,13 +498,12 @@ export default async function HomePage() {
                   Ühenda serveriga ▶
                 </a>
               ) : (
-                <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3.5 text-xs text-zinc-400">
+                <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.03] p-3.5 text-xs text-zinc-400">
                   Määra FiveM serveri kood jaotises Admin → Bränding ja välimus.
                 </div>
               )}
             </section>
 
-            {/* TOP 10 EDETABEL */}
             <section className="rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <div>
