@@ -29,15 +29,15 @@ export function Header() {
     );
   }
 
+  // "Kogukond" on eemaldatud
   const navLinks = [
     { href: "/", label: "Avaleht" },
-    { href: "/community", label: "Kogukond" },
     { href: "/rules", label: "Reeglid" },
     { href: "/store", label: branding.storeNavLabel || "Pood" },
     { href: "/applications", label: "Minu avaldused" },
     { href: "/apply", label: branding.whitelistNavLabel || "Whitelist" },
     { href: "/apply/staff", label: "Meeskond" },
-    ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+    ...(isAdmin ? [{ href: "/admin", label: "Admin" }] :),
   ];
 
   const logoBlock = (
