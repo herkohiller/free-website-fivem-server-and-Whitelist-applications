@@ -24,9 +24,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FiveM Whitelist | Applications",
+  title: "Streets of San Andreas RP | Kogukond ja avaldused",
   description:
-    "Apply for whitelist access. Discord OAuth2, application form, and admin panel for your FiveM server.",
+    "Liitu Streets of San Andreas RP serveriga. Esita whitelist-avaldus, tutvu reeglitega ja liitu kogukonnaga.",
 };
 
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export default async function RootLayout({
   const brandingCssVariables = getBrandingCssVariables(branding);
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="et" className="dark scroll-smooth" suppressHydrationWarning>
       <body
         className={`${outfit.variable} ${jetbrainsMono.variable} flex min-h-screen flex-col bg-zinc-950 font-sans text-zinc-100 antialiased`}
         style={brandingCssVariables as CSSProperties}
@@ -52,7 +52,7 @@ export default async function RootLayout({
                 <SiteActivityTracker />
                 <TopBanner />
                 <Header />
-                <main className="container mx-auto flex-1 max-w-5xl px-4 py-6 sm:px-4 sm:py-8">{children}</main>
+                <main className="flex-1 w-full">{children}</main>
                 <Footer />
               </ToastProvider>
             </AuthSessionProvider>
