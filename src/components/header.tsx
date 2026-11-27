@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import { appConfig } from "@/config/app.config";
@@ -9,166 +10,157 @@ import { useBranding } from "@/components/branding-provider";
 export function Header() {
   const { data: session, status } = useSession();
   const branding = useBranding();
+  const pathname = usePathname();
   const isAdmin = (session?.user as { isAdmin?: boolean } | undefined)?.isAdmin;
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const publicLinks = [
+    { href: "/", label: "Avaleht" },
     { href: "/community", label: "Kogukond" },
     { href: "/rules", label: "Reeglid" },
-    { href: "/store", label: branding.storeNavLabel },
+    { href: "/store", label: branding.storeNavLabel || "Pood" },
   ];
 
   const signedInLinks = [
     ...publicLinks,
     { href: "/applications", label: "Minu avaldused" },
-    { href: "/apply", label: branding.whitelistNavLabel },
+    { href: "/apply", label: branding.whitelistNavLabel || "Whitelist" },
     { href: "/apply/staff", label: "Meeskond" },
     ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
   const navLinks = session ? signedInLinks : publicLinks;
 
-  const logoLink = (
-    <Link href="/" className="flex min-w-0 max-w-[min(100%,18rem)] items-center gap-3 font-semibold text-zinc-100">
+  const logoBlock = (
+    <Link
+      href="/"
+      onClick={() => setMobileOpen(false)}
+      className="flex items-center gap-3 px-2 py-2 font-bold text-zinc-100"
+    >
       {branding.logoDataUrl ? (
         <img
           src={branding.logoDataUrl}
           alt={`${branding.siteName} logo`}
-          className="h-9 w-9 shrink-0 rounded-lg object-cover"
-          width={36}
-          height={36}
+          className="h-11 w-11 shrink-0 rounded-xl object-cover shadow-md"
+          width={44}
+          height={44}
         />
       ) : (
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg brand-bg text-sm font-bold">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl brand-bg text-base font-extrabold shadow-md">
           {branding.headerIcon || appConfig.headerIcon}
         </span>
       )}
-      <span className="truncate">{branding.siteName}</span>
+      <span className="truncate text-base tracking-tight">{branding.siteName}</span>
     </Link>
   );
 
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/60">
-      <div className="container mx-auto max-w-7xl px-4 py-3">
-        {/* Mobile: logo left, menu right */}
-        <div className="flex min-h-12 items-center justify-between gap-3 md:hidden">
-          {logoLink}
+  const renderLinks = (onNavigate?: () => void) => (
+    <nav className="flex flex-col gap-1.5" aria-label="Külgmenüü">
+      {status === "loading" ? (
+        <span className="px-3 py-2 text-sm text-zinc-500">Laadimine…</span>
+      ) : (
+        navLinks.map((link) => {
+          const isActive =
+            link.href === "/" ? pathname === "/" : pathname?.startsWith(link.href);
+
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={onNavigate}
+              className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition ${
+                isActive
+                  ? "border border-[var(--accent)]/40 bg-[var(--accent)]/15 text-white shadow-sm"
+                  : "border border-transparent text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+              }`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full transition ${
+                  isActive ? "bg-[var(--accent)]" : "bg-zinc-700"
+                }`}
+              />
+              <span className="truncate">{link.label}</span>
+            </Link>
+          );
+        })
+      )}
+    </nav>
+  );
+
+  const authBlock = (
+    <div className="border-t border-zinc-800/80 pt-4">
+      {status === "loading" ? null : session ? (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 rounded-xl border border-zinc-800/80 bg-zinc-900/70 px-3 py-2.5">
+            {(session.user as { image?: string | null })?.image ? (
+              <img
+                src={(session.user as { image: string }).image}
+                alt=""
+                className="h-9 w-9 shrink-0 rounded-full object-cover"
+                width={36}
+                height={36}
+              />
+            ) : (
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-300">
+                {(session.user?.name || "U").slice(0, 1).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-zinc-100">
+                {session.user?.name}
+              </p>
+              <p className="text-[11px] text-emerald-400">Sisse logitud</p>
+            </div>
+          </div>
           <button
             type="button"
-            onClick={() => setMobileOpen((current) => !current)}
-            className="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800"
-            aria-expanded={mobileOpen}
-            aria-label="Ava või sulge menüü"
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="w-full rounded-xl border border-zinc-700/80 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:border-zinc-500 hover:bg-zinc-800 hover:text-white"
           >
-            {mobileOpen ? "Sulge" : "Menüü"}
+            Logi välja
           </button>
         </div>
+      ) : (
+        <Link
+          href="/api/auth/signin/discord"
+          className="flex w-full items-center justify-center rounded-xl bg-[#5865f2] px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#4752c4]"
+        >
+          Logi sisse Discordiga
+        </Link>
+      )}
+    </div>
+  );
 
-        {/* Desktop: logo | centered nav | auth */}
-        <div className="hidden min-h-14 min-w-0 items-center md:flex md:gap-4 lg:gap-6">
-          <div className="flex min-w-0 flex-1 basis-0 items-center justify-start">{logoLink}</div>
+  return (
+    <>
+      {/* MOBIILIVAADE: Ülemine riba + avanev sahtel */}
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-950/90 px-4 py-3 backdrop-blur md:hidden">
+        {logoBlock}
+        <button
+          type="button"
+          onClick={() => setMobileOpen((current) => !current)}
+          className="rounded-lg border border-zinc-700 px-3 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800"
+          aria-expanded={mobileOpen}
+        >
+          {mobileOpen ? "Sulge" : "Menüü"}
+        </button>
+      </header>
 
-          <nav
-            className="flex min-w-0 max-w-full shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-5 lg:gap-x-6"
-            aria-label="Peamenüü"
-          >
-            {status === "loading" ? (
-              <span className="text-sm text-zinc-500">Laadimine…</span>
-            ) : (
-              navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="max-w-[9.5rem] text-center text-sm font-medium leading-snug text-zinc-300 transition hover:text-[var(--accent)] sm:max-w-none sm:whitespace-nowrap"
-                >
-                  {link.label}
-                </Link>
-              ))
-            )}
-          </nav>
-
-          <div className="flex min-w-0 flex-1 basis-0 items-center justify-end gap-3">
-            {status === "loading" ? null : session ? (
-              <>
-                <span className="flex min-w-0 max-w-[11rem] items-center gap-2 text-sm text-zinc-400 xl:max-w-[14rem]">
-                  {(session.user as { image?: string | null })?.image ? (
-                    <img
-                      src={(session.user as { image: string }).image}
-                      alt=""
-                      className="h-7 w-7 shrink-0 rounded-full object-cover"
-                      width={28}
-                      height={28}
-                    />
-                  ) : null}
-                  <span className="truncate">{session.user?.name}</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="shrink-0 rounded-lg border border-zinc-600 bg-zinc-800/80 px-3 py-1.5 text-sm font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-700"
-                >
-                  Logi välja
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/api/auth/signin/discord"
-                className="shrink-0 rounded-lg bg-[#5865f2] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#4752c4]"
-              >
-                Logi sisse Discordiga
-              </Link>
-            )}
-          </div>
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 flex flex-col justify-between bg-zinc-950/98 px-4 pt-20 pb-6 md:hidden">
+          {renderLinks(() => setMobileOpen(false))}
+          {authBlock}
         </div>
-      </div>
-      <div className={`border-t border-zinc-800 bg-zinc-950/95 px-4 py-4 md:hidden ${mobileOpen ? "block" : "hidden"}`}>
-        {status === "loading" ? (
-          <span className="text-sm text-zinc-500">Laadimine…</span>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="w-full rounded-lg border border-zinc-800 px-4 py-3 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900"
-              >
-                {link.label}
-              </Link>
-            ))}
-            {session ? (
-              <>
-                <div className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm text-zinc-300">
-                  {(session.user as { image?: string | null })?.image ? (
-                    <img
-                      src={(session.user as { image: string }).image}
-                      alt=""
-                      className="h-8 w-8 rounded-full object-cover"
-                      width={32}
-                      height={32}
-                    />
-                  ) : null}
-                  <span className="min-w-0 truncate">{session.user?.name}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm font-semibold text-zinc-100 transition hover:bg-zinc-700"
-                >
-                  Logi välja
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/api/auth/signin/discord"
-                className="w-full rounded-lg bg-[#5865f2] px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#4752c4]"
-              >
-                Logi sisse Discordiga
-              </Link>
-            )}
-          </div>
-        )}
-      </div>
-    </header>
+      )}
+
+      {/* ARVUTIVAADE: Vasakpoolne fikseeritud külgmenüü (Sidebar) */}
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col justify-between border-r border-zinc-800/80 bg-zinc-950/95 p-4 md:flex">
+        <div className="space-y-6 overflow-y-auto">
+          {logoBlock}
+          <div className="border-t border-zinc-800/80 pt-4">{renderLinks()}</div>
+        </div>
+        {authBlock}
+      </aside>
+    </>
   );
 }
