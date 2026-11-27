@@ -78,8 +78,8 @@ const EMPTY_ITEM_FORM: ItemFormState = {
   price: "",
   oldPrice: "",
   currency: "USD",
-  statusText: "Stock Available",
-  buttonLabel: "Buy now",
+  statusText: "Laos olemas",
+  buttonLabel: "Osta kohe",
   purchaseUrl: "",
   featureList: "",
   sortOrder: "0",
@@ -125,7 +125,7 @@ export function AdminStoreManager() {
           categoryId: current.categoryId || categoriesData[0]?.id || "",
         }))
       } catch {
-        toast.addToast("Failed to load store manager", "error")
+        toast.addToast("Poehalduri laadimine ebaõnnestus", "error")
       } finally {
         setLoading(false)
       }
@@ -186,7 +186,7 @@ export function AdminStoreManager() {
 
       const data = await response.json().catch(() => ({}))
       if (!response.ok) {
-        toast.addToast(data.error || "Failed to save category", "error")
+        toast.addToast(data.error || "Kategooria salvestamine ebaõnnestus", "error")
         return
       }
 
@@ -200,9 +200,9 @@ export function AdminStoreManager() {
         categoryId: current.categoryId || data.id,
       }))
       resetCategoryForm()
-      toast.addToast(categoryForm.id ? "Category updated" : "Category created", "success")
+      toast.addToast(categoryForm.id ? "Kategooria uuendatud" : "Kategooria loodud", "success")
     } catch {
-      toast.addToast("Failed to save category", "error")
+      toast.addToast("Kategooria salvestamine ebaõnnestus", "error")
     } finally {
       setSavingCategory(false)
     }
@@ -240,7 +240,7 @@ export function AdminStoreManager() {
 
       const data = await response.json().catch(() => ({}))
       if (!response.ok) {
-        toast.addToast(data.error || "Failed to save item", "error")
+        toast.addToast(data.error || "Toote salvestamine ebaõnnestus", "error")
         return
       }
 
@@ -250,16 +250,16 @@ export function AdminStoreManager() {
           : [data, ...current]
       )
       resetItemForm(itemForm.categoryId)
-      toast.addToast(itemForm.id ? "Product updated" : "Product created", "success")
+      toast.addToast(itemForm.id ? "Toode uuendatud" : "Toode loodud", "success")
     } catch {
-      toast.addToast("Failed to save item", "error")
+      toast.addToast("Toote salvestamine ebaõnnestus", "error")
     } finally {
       setSavingItem(false)
     }
   }
 
   async function handleDeleteCategory(category: StoreCategory) {
-    if (!confirm(`Delete "${category.name}"? All products in this category will also be removed.`)) {
+    if (!confirm(`Kas kustutada kategooria "${category.name}"? Kõik selles kategoorias olevad tooted eemaldatakse samuti.`)) {
       return
     }
 
@@ -281,14 +281,14 @@ export function AdminStoreManager() {
         resetItemForm(sortedCategories.find((entry) => entry.id !== category.id)?.id)
       }
 
-      toast.addToast("Category deleted", "success")
+      toast.addToast("Kategooria kustutatud", "success")
     } catch {
-      toast.addToast("Failed to delete category", "error")
+      toast.addToast("Kategooria kustutamine ebaõnnestus", "error")
     }
   }
 
   async function handleDeleteItem(itemId: string) {
-    if (!confirm("Delete this product from the store?")) return
+    if (!confirm("Kas kustutada see toode poest?")) return
 
     try {
       const response = await fetch(`/api/store/items/${itemId}`, {
@@ -301,21 +301,21 @@ export function AdminStoreManager() {
       if (itemForm.id === itemId) {
         resetItemForm(itemForm.categoryId)
       }
-      toast.addToast("Product deleted", "success")
+      toast.addToast("Toode kustutatud", "success")
     } catch {
-      toast.addToast("Failed to delete item", "error")
+      toast.addToast("Toote kustutamine ebaõnnestus", "error")
     }
   }
 
   if (loading) {
-    return <p className="text-zinc-500">Loading store manager...</p>
+    return <p className="text-zinc-500">Poehalduri laadimine...</p>
   }
 
   return (
     <div className="space-y-8">
       <p className="text-sm text-zinc-500 dark:text-zinc-400">
-        This editor now controls the new storefront style. Category cover images, product text,
-        prices, links, status lines, and comparison features all stay editable from here.
+        See redaktor juhib poe uut välimust. Kategooriate kaanepildid, tootekirjeldused,
+        hinnad, lingid, olekutekstid ja võrdlusomadused on kõik siit muudetavad.
       </p>
 
       <section className="grid gap-6 xl:grid-cols-[1.1fr,0.9fr]">
@@ -326,10 +326,10 @@ export function AdminStoreManager() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="text-lg font-semibold text-zinc-100">
-                {categoryForm.id ? "Edit category" : "Create category"}
+                {categoryForm.id ? "Muuda kategooriat" : "Loo kategooria"}
               </h3>
               <p className="text-sm text-zinc-400">
-                These categories power the large cover cards at the top of the store page.
+                Need kategooriad kuvatakse poelehe ülaosas suurte kaanekaartidena.
               </p>
             </div>
             {categoryForm.id && (
@@ -338,25 +338,25 @@ export function AdminStoreManager() {
                 onClick={resetCategoryForm}
                 className="text-sm text-zinc-400 hover:text-zinc-200"
               >
-                Cancel
+                Tühista
               </button>
             )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Name</span>
+              <span>Nimi</span>
               <input
                 value={categoryForm.name}
                 onChange={(event) =>
                   setCategoryForm((current) => ({ ...current, name: event.target.value }))
                 }
-                placeholder="e.g. VIP"
+                placeholder="nt VIP"
                 className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
               />
             </label>
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Sort order</span>
+              <span>Järjestus</span>
               <input
                 type="number"
                 value={categoryForm.sortOrder}
@@ -369,26 +369,26 @@ export function AdminStoreManager() {
           </div>
 
           <label className="block space-y-1 text-sm text-zinc-300">
-            <span>Description</span>
+            <span>Kirjeldus</span>
             <textarea
               value={categoryForm.description}
               onChange={(event) =>
                 setCategoryForm((current) => ({ ...current, description: event.target.value }))
               }
               rows={3}
-              placeholder="Shown under the products heading when this category is selected."
+              placeholder="Kuvatakse toodete pealkirja all, kui see kategooria on valitud."
               className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
             />
           </label>
 
           <label className="block space-y-1 text-sm text-zinc-300">
-            <span>Cover image URL</span>
+            <span>Kaanepildi URL</span>
             <input
               value={categoryForm.imageUrl}
               onChange={(event) =>
                 setCategoryForm((current) => ({ ...current, imageUrl: event.target.value }))
               }
-              placeholder="https://example.com/category-cover.png"
+              placeholder="https://example.com"
               className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
             />
           </label>
@@ -397,7 +397,7 @@ export function AdminStoreManager() {
             <div className="overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
               <img
                 src={categoryForm.imageUrl}
-                alt="Category preview"
+                alt="Kategooria eelvaade"
                 className="h-40 w-full object-cover"
               />
             </div>
@@ -409,20 +409,20 @@ export function AdminStoreManager() {
             className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-500 disabled:opacity-50"
           >
             {savingCategory
-              ? "Saving..."
+              ? "Salvestamine..."
               : categoryForm.id
-                ? "Update category"
-                : "Create category"}
+                ? "Uuenda kategooriat"
+                : "Loo kategooria"}
           </button>
         </form>
 
         <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
           <h3 className="mb-4 text-lg font-semibold text-zinc-100">
-            Categories ({sortedCategories.length})
+            Kategooriad ({sortedCategories.length})
           </h3>
           <div className="space-y-3">
             {sortedCategories.length === 0 ? (
-              <p className="text-sm text-zinc-500">No categories yet.</p>
+              <p className="text-sm text-zinc-500">Kategooriaid pole veel lisatud.</p>
             ) : (
               sortedCategories.map((category) => (
                 <div
@@ -438,7 +438,7 @@ export function AdminStoreManager() {
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center text-sm text-zinc-500">
-                        No cover image
+                        Kaanepilt puudub
                       </div>
                     )}
                   </div>
@@ -446,7 +446,8 @@ export function AdminStoreManager() {
                     <div>
                       <p className="font-medium text-zinc-100">{category.name}</p>
                       <p className="text-sm text-zinc-400">
-                        {category._count?.items ?? 0} items
+                        {category._count?.items ?? 0}{" "}
+                        {(category._count?.items ?? 0) === 1 ? "toode" : "toodet"}
                         {category.description ? ` • ${category.description}` : ""}
                       </p>
                     </div>
@@ -464,14 +465,14 @@ export function AdminStoreManager() {
                         }
                         className="text-amber-400 hover:text-amber-300"
                       >
-                        Edit
+                        Muuda
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDeleteCategory(category)}
                         className="text-red-400 hover:text-red-300"
                       >
-                        Delete
+                        Kustuta
                       </button>
                     </div>
                   </div>
@@ -490,10 +491,10 @@ export function AdminStoreManager() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="text-lg font-semibold text-zinc-100">
-                {itemForm.id ? "Edit product" : "Create product"}
+                {itemForm.id ? "Muuda toodet" : "Loo toode"}
               </h3>
               <p className="text-sm text-zinc-400">
-                Products can now drive store cards and the comparison table.
+                Tooted kuvatakse poekaartidel ja võrdlustabelis.
               </p>
             </div>
             {itemForm.id && (
@@ -502,14 +503,14 @@ export function AdminStoreManager() {
                 onClick={() => resetItemForm(itemForm.categoryId)}
                 className="text-sm text-zinc-400 hover:text-zinc-200"
               >
-                Cancel
+                Tühista
               </button>
             )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Category</span>
+              <span>Kategooria</span>
               <select
                 value={itemForm.categoryId}
                 onChange={(event) =>
@@ -519,7 +520,7 @@ export function AdminStoreManager() {
                 disabled={sortedCategories.length === 0}
               >
                 {sortedCategories.length === 0 ? (
-                  <option value="">Create a category first</option>
+                  <option value="">Loo esmalt kategooria</option>
                 ) : (
                   sortedCategories.map((category) => (
                     <option key={category.id} value={category.id}>
@@ -531,19 +532,19 @@ export function AdminStoreManager() {
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Title</span>
+              <span>Pealkiri</span>
               <input
                 value={itemForm.title}
                 onChange={(event) =>
                   setItemForm((current) => ({ ...current, title: event.target.value }))
                 }
-                placeholder="e.g. VIP+"
+                placeholder="nt VIP+"
                 className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
               />
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Current price</span>
+              <span>Praegune hind</span>
               <input
                 type="number"
                 min="0"
@@ -558,7 +559,7 @@ export function AdminStoreManager() {
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Old price (optional)</span>
+              <span>Vana hind (valikuline)</span>
               <input
                 type="number"
                 min="0"
@@ -573,7 +574,7 @@ export function AdminStoreManager() {
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Currency</span>
+              <span>Valuuta</span>
               <input
                 value={itemForm.currency}
                 onChange={(event) =>
@@ -585,55 +586,55 @@ export function AdminStoreManager() {
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Status text</span>
+              <span>Olekutekst</span>
               <input
                 value={itemForm.statusText}
                 onChange={(event) =>
                   setItemForm((current) => ({ ...current, statusText: event.target.value }))
                 }
-                placeholder="Stock Available"
+                placeholder="Laos olemas"
                 className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
               />
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Button label</span>
+              <span>Nupu tekst</span>
               <input
                 value={itemForm.buttonLabel}
                 onChange={(event) =>
                   setItemForm((current) => ({ ...current, buttonLabel: event.target.value }))
                 }
-                placeholder="Buy now"
+                placeholder="Osta kohe"
                 className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
               />
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300 md:col-span-2">
-              <span>Purchase URL (optional)</span>
+              <span>Ostulink (URL, valikuline)</span>
               <input
                 value={itemForm.purchaseUrl}
                 onChange={(event) =>
                   setItemForm((current) => ({ ...current, purchaseUrl: event.target.value }))
                 }
-                placeholder="https://your-store-link.example/product"
+                placeholder="https://your-store-link.example"
                 className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
               />
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Image URL</span>
+              <span>Pildi URL</span>
               <input
                 value={itemForm.imageUrl}
                 onChange={(event) =>
                   setItemForm((current) => ({ ...current, imageUrl: event.target.value }))
                 }
-                placeholder="https://example.com/product.png"
+                placeholder="https://example.com"
                 className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
               />
             </label>
 
             <label className="space-y-1 text-sm text-zinc-300">
-              <span>Sort order</span>
+              <span>Järjestus</span>
               <input
                 type="number"
                 value={itemForm.sortOrder}
@@ -646,27 +647,27 @@ export function AdminStoreManager() {
           </div>
 
           <label className="block space-y-1 text-sm text-zinc-300">
-            <span>Description</span>
+            <span>Kirjeldus</span>
             <textarea
               value={itemForm.description}
               onChange={(event) =>
                 setItemForm((current) => ({ ...current, description: event.target.value }))
               }
               rows={3}
-              placeholder="Visible inside the product card."
+              placeholder="Toote kirjeldus"
               className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
             />
           </label>
 
           <label className="block space-y-1 text-sm text-zinc-300">
-            <span>Comparison features</span>
+            <span>Võrdlusomadused (üks rea kohta)</span>
             <textarea
               value={itemForm.featureList}
               onChange={(event) =>
                 setItemForm((current) => ({ ...current, featureList: event.target.value }))
               }
-              rows={6}
-              placeholder={`One feature per line\n/fly\nPriority queue\nCustom starter pack`}
+              rows={4}
+              placeholder="Prioriteetne järjekord&#10;Eksklusiivne roll Discordis"
               className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none transition focus:border-amber-500"
             />
           </label>
@@ -680,33 +681,29 @@ export function AdminStoreManager() {
               }
               className="h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-amber-500 focus:ring-amber-500"
             />
-            <span>Show this product on the public store page</span>
+            <span>Poes nähtav</span>
           </label>
-
-          {itemForm.imageUrl && (
-            <div className="overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
-              <img
-                src={itemForm.imageUrl}
-                alt="Product preview"
-                className="h-44 w-full object-cover"
-              />
-            </div>
-          )}
 
           <button
             type="submit"
-            disabled={savingItem || sortedCategories.length === 0}
+            disabled={savingItem}
             className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-500 disabled:opacity-50"
           >
-            {savingItem ? "Saving..." : itemForm.id ? "Update product" : "Create product"}
+            {savingItem
+              ? "Salvestamine..."
+              : itemForm.id
+                ? "Uuenda toodet"
+                : "Loo toode"}
           </button>
         </form>
 
         <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
-          <h3 className="mb-4 text-lg font-semibold text-zinc-100">Products ({sortedItems.length})</h3>
+          <h3 className="mb-4 text-lg font-semibold text-zinc-100">
+            Tooted ({sortedItems.length})
+          </h3>
           <div className="space-y-3">
             {sortedItems.length === 0 ? (
-              <p className="text-sm text-zinc-500">No products yet.</p>
+              <p className="text-sm text-zinc-500">Tooteid pole veel lisatud.</p>
             ) : (
               sortedItems.map((item) => (
                 <div
@@ -722,7 +719,7 @@ export function AdminStoreManager() {
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs text-zinc-500">
-                        No image
+                        Pilt puudub
                       </div>
                     )}
                   </div>
@@ -735,10 +732,10 @@ export function AdminStoreManager() {
                           {item.category.name} • {formatPriceFromCents(item.priceCents, item.currency)}
                         </p>
                         <p className="text-xs text-emerald-300">
-                          {item.statusText || "Stock Available"}
+                          {item.statusText || "Laos olemas"}
                         </p>
                         <p className="text-xs text-zinc-500">
-                          {item.isActive ? "Visible on store" : "Hidden from store"}
+                          {item.isActive ? "Poes nähtav" : "Poes peidetud"}
                         </p>
                       </div>
 
@@ -755,7 +752,7 @@ export function AdminStoreManager() {
                               price: centsToInput(item.priceCents),
                               oldPrice: item.oldPriceCents ? centsToInput(item.oldPriceCents) : "",
                               currency: item.currency,
-                              statusText: item.statusText ?? "Stock Available",
+                              statusText: item.statusText ?? "Laos olemas",
                               buttonLabel: item.buttonLabel,
                               purchaseUrl: item.purchaseUrl ?? "",
                               featureList: item.featureList.join("\n"),
@@ -765,14 +762,14 @@ export function AdminStoreManager() {
                           }
                           className="text-amber-400 hover:text-amber-300"
                         >
-                          Edit
+                          Muuda
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDeleteItem(item.id)}
                           className="text-red-400 hover:text-red-300"
                         >
-                          Delete
+                          Kustuta
                         </button>
                       </div>
                     </div>
@@ -783,7 +780,8 @@ export function AdminStoreManager() {
 
                     {item.featureList.length > 0 && (
                       <p className="text-xs text-zinc-500">
-                        {item.featureList.length} comparison features configured
+                        Seadistatud {item.featureList.length}{" "}
+                        {item.featureList.length === 1 ? "võrdlusomadus" : "võrdlusomadust"}
                       </p>
                     )}
                   </div>
