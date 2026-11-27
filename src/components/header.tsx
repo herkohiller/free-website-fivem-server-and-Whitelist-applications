@@ -31,7 +31,6 @@ export function Header() {
   const navLinks = [
     { href: "/", label: "Avaleht" },
     { href: "/rules", label: "Reeglid" },
-    { href: "/store", label: branding.storeNavLabel || "Pood" },
     { href: "/applications", label: "Minu avaldused" },
     { href: "/apply", label: branding.whitelistNavLabel || "Whitelist" },
     { href: "/apply/staff", label: "Meeskond" },
