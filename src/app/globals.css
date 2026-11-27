@@ -66,3 +66,6 @@ input, textarea, select {
 .brand-ring {
   box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.18);
 }
+div[style*="taust"] {
+  display: none !important;
+}
