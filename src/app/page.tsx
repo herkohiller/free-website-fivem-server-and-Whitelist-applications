@@ -1,91 +1,33 @@
-import { prisma } from "@/lib/prisma";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { signIn, useSession } from "next-auth/react";
 
-// 👇 ASENDA NEED 4 OMA JUHTKONNA PÄRIS DISCORDI ID-DEGA (AINULT NUMBRID JUTUMÄRKIDE SEES):
-const LEADERSHIP_DISCORD_IDS = [
-  "1226573496860151999",
-  "1428023982422102160",
-  "989929420099825715",
-];
-
-type LeaderProfile = {
-  discordId: string;
-  username: string;
-  avatar: string | null;
+type Leader = {
+  name: string;
+  image?: string;
 };
 
-function makeAvatarSharp(url: string | null): string | null {
-  if (!url) return null;
-  if (url.includes("discordapp.com")) {
-    const baseUrl = url.split("?")[0];
-    return `${baseUrl}?size=1024`;
-  }
-  return url;
-}
+const LEADERSHIP_MEMBERS: Leader[] = [
+  {
+    name: "Esimene nimi",
+    // image: "/juht1.png",
+  },
+  {
+    name: "Teine nimi",
+    // image: "/juht2.png",
+  },
+  {
+    name: "Kolmas nimi",
+    // image: "/juht3.png",
+  },
+  {
+    name: "Neljas nimi",
+    // image: "/juht4.png",
+  },
+];
 
-function discordAvatarUrl(userId: string, avatarHash: string | null): string | null {
-  if (!avatarHash) return null;
-  const ext = avatarHash.startsWith("a_") ? "gif" : "png";
-  return `https://discordapp.com{userId}/${avatarHash}.${ext}?size=1024`;
-}
-
-async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
-  const cleanId = discordId.trim();
-
-  // 1. Proovime võtta otse Discordi API-st (kõrgeima kvaliteediga pilt ja värskeim nimi)
-  const botToken = process.env.DISCORD_BOT_TOKEN?.trim();
-  if (botToken && cleanId) {
-    try {
-      const res = await fetch(`https://discord.com{cleanId}`, {
-        headers: { Authorization: `Bot ${botToken}` },
-        next: { revalidate: 300 },
-      });
-      if (res.ok) {
-        const data = (await res.json()) as {
-          username?: string;
-          global_name?: string | null;
-          avatar?: string | null;
-        };
-        return {
-          discordId: cleanId,
-          username: data.global_name || data.username || "Teadmata",
-          avatar: discordAvatarUrl(cleanId, data.avatar ?? null),
-        };
-      }
-    } catch {
-      // Kui Discord API ei vasta, liigume edasi andmebaasi päringu juurde
-    }
-  }
-
-  // 2. Varuvõimalus: otsime veebilehe andmebaasist ja teeme pildi teravaks (?size=1024)
-  try {
-    const user = await prisma.user.findUnique({
-      where: { discordId: cleanId },
-      select: { username: true, avatar: true },
-    });
-    if (user) {
-      return {
-        discordId: cleanId,
-        username: user.username,
-        avatar: makeAvatarSharp(user.avatar ?? null),
-      };
-    }
-  } catch {
-    // Ignoreerime andmebaasi viga
-  }
-
-  return {
-    discordId: cleanId,
-    username: "Teadmata",
-    avatar: null,
-  };
-}
-
-export default async function HomePage() {
-  const leaders = await Promise.all(
-    LEADERSHIP_DISCORD_IDS.map((id) => resolveDiscordLeader(id))
-  );
+export default function HomePage() {
+  const { data: session, status } = useSession();
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-zinc-950 text-white">
@@ -97,7 +39,7 @@ export default async function HomePage() {
       <div className="pointer-events-none fixed inset-0 z-0 bg-gradient-to-b from-zinc-950/70 via-zinc-950/85 to-zinc-950" />
 
       {/* 1. ÜLEMINE VAADE (HERO) */}
-      <section className="relative z-10 flex min-h-[calc(100vh-4.5rem)] flex-col items-center justify-center px-4 py-16 text-center">
+      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-16 text-center">
         <div className="mx-auto max-w-4xl">
           <h1 className="text-4xl font-black uppercase tracking-tight sm:text-6xl md:text-7xl">
             <span className="text-white">STREETS OF </span>
@@ -110,8 +52,21 @@ export default async function HomePage() {
             <span className="h-5 w-0.5 shrink-0 bg-orange-500" />
           </div>
 
+          {/* Sisselogimise nupp (nähtav ainult enne sisselogimist) */}
+          {status !== "loading" && !session && (
+            <div className="mt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={() => signIn("discord")}
+                className="cursor-pointer rounded-xl bg-[#5865F2] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#5865F2]/25 transition hover:bg-[#4752C4] sm:text-lg"
+              >
+                Logi sisse Discordiga
+              </button>
+            </div>
+          )}
+
           {/* Allapoole kerimise nool */}
-          <div className="mt-16 flex justify-center">
+          <div className="mt-14 flex justify-center">
             <a
               href="#juhtkond"
               aria-label="Keri juhtkonna juurde"
@@ -146,30 +101,27 @@ export default async function HomePage() {
         </h2>
 
         <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {leaders.map((leader, index) => (
+          {LEADERSHIP_MEMBERS.map((leader, index) => (
             <div
-              key={`${leader.discordId}-${index}`}
+              key={index}
               className="group flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1"
             >
-              {/* Terav Discordi profiilipilt */}
               <div className="aspect-square w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/90 shadow-xl">
-                {leader.avatar ? (
+                {leader.image ? (
                   <img
-                    src={leader.avatar}
-                    alt={leader.username}
-                    loading="eager"
+                    src={leader.image}
+                    alt={leader.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-800/80 to-zinc-950 text-5xl font-extrabold text-orange-500/80">
-                    {leader.username.slice(0, 1).toUpperCase()}
+                    {leader.name.slice(0, 1).toUpperCase()}
                   </div>
                 )}
               </div>
 
-              {/* Discordi nimi */}
               <h3 className="mt-4 text-lg font-bold text-white">
-                {leader.username}
+                {leader.name}
               </h3>
             </div>
           ))}
