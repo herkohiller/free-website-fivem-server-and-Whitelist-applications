@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
-import { appConfig } from "@/config/app.config";
 import { useBranding } from "@/components/branding-provider";
 
 export function Header() {
@@ -46,19 +45,13 @@ export function Header() {
       onClick={() => setMobileOpen(false)}
       className="flex items-center gap-3 px-2 py-2 font-bold text-zinc-100"
     >
-      {branding.logoDataUrl ? (
-        <img
-          src={branding.logoDataUrl}
-          alt={`${branding.siteName} logo`}
-          className="h-11 w-11 shrink-0 rounded-xl object-cover shadow-md"
-          width={44}
-          height={44}
-        />
-      ) : (
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl brand-bg text-base font-extrabold shadow-md">
-          {branding.headerIcon || appConfig.headerIcon}
-        </span>
-      )}
+      <img
+        src="/logo.png"
+        alt={`${branding.siteName} logo`}
+        className="h-11 w-11 shrink-0 rounded-xl object-cover shadow-md"
+        width={44}
+        height={44}
+      />
       <span className="truncate text-base tracking-tight">{branding.siteName}</span>
     </Link>
   );
