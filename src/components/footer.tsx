@@ -8,7 +8,7 @@ export function Footer() {
   const branding = useBranding();
 
   return (
-    <footer className="relative z-10 mt-12 border-t border-white/10 bg-zinc-950/90 text-zinc-400 backdrop-blur-xl">
+    <footer className="relative z-10 mt-12 border-t border-white/10 bg-black text-zinc-400">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 md:flex-row md:py-12">
         {/* Bränd ja kirjeldus */}
         <section className="flex-1 space-y-4">
@@ -106,20 +106,17 @@ export function Footer() {
       </div>
 
       {/* Alumine riba */}
-      <div className="border-t border-white/10 bg-black/80">
+      <div className="border-t border-white/10 bg-black">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-4 text-[11px] text-zinc-500 md:flex-row">
           <p className="text-center md:text-left">
             © {year} {branding.serverName || "Streets of San Andreas"}.{" "}
             {branding.footerCopyrightNote ||
               "Ei ole seotud ettevõtetega Rockstar Games ega Take-Two Interactive."}
           </p>
-          <div className="flex flex-wrap items-center gap-4 text-center text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-            <span>{branding.footerBottomTaglineLeft || "AUSTA TÄNAVAID"}</span>
-            <span className="h-px w-8 bg-zinc-700" />
-            <span>
-              {branding.footerBottomTaglineRight || "ROLLIMÄNG • KOGUKOND • LOOD"}
-            </span>
-          </div>
+          <p className="text-center text-xs text-zinc-500 md:text-right">
+            Developed by{" "}
+            <span className="font-semibold text-zinc-200">herkzz</span>
+          </p>
         </div>
       </div>
     </footer>
