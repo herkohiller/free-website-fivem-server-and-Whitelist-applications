@@ -2,12 +2,11 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 👇 PANE SIIA OMA JUHTKONNA LIIKMETE DISCORDI ID-D:
+// 👇 ASENDA NEED 4 OMA JUHTKONNA PÄRIS DISCORDI ID-DEGA (AINULT NUMBRID JUTUMÄRKIDE SEES):
 const LEADERSHIP_DISCORD_IDS = [
-  "ESIMESE_LIIKME_DISCORD_ID",
-  "TEISE_LIIKME_DISCORD_ID",
-  "KOLMANDA_LIIKME_DISCORD_ID",
-  "NELJANDA_LIIKME_DISCORD_ID",
+  "1226573496860151999",
+  "1428023982422102160",
+  "989929420099825715",
 ];
 
 type LeaderProfile = {
@@ -19,7 +18,7 @@ type LeaderProfile = {
 function makeAvatarSharp(url: string | null): string | null {
   if (!url) return null;
   if (url.includes("discordapp.com")) {
-    const baseUrl = url.split("?");
+    const baseUrl = url.split("?")[0];
     return `${baseUrl}?size=1024`;
   }
   return url;
