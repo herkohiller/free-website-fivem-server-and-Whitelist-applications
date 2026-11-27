@@ -276,6 +276,7 @@ export default async function HomePage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="space-y-6 lg:col-span-8">
+            {/* SINU KODANIKU PASS (ID-KAARDI VISUAALIGA) */}
             <section className="rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -290,21 +291,79 @@ export default async function HomePage() {
               </div>
 
               {approvedChar ? (
-                <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-[150px_1fr]">
-                  <div className="aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70">
-                    {session.user.image ? (
-                      <img
-                        src={session.user.image}
-                        alt={approvedChar.inGameName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-4xl font-black text-zinc-600">
-                        {approvedChar.inGameName.slice(0, 1).toUpperCase()}
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[260px_1fr]">
+                  {/* AMETLIK ID-KAART */}
+                  <div className="relative overflow-hidden rounded-2xl border border-rose-500/30 bg-gradient-to-br from-zinc-900 via-zinc-950 to-rose-950/40 p-4 shadow-xl">
+                    {/* ID-kaardi ülemine riba */}
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-rose-400">
+                          SAN ANDREAS
+                        </p>
+                        <p className="text-xs font-extrabold tracking-wide text-white">
+                          ISIKUTUNNISTUS
+                        </p>
                       </div>
-                    )}
+                      {/* Kiibi ikoon */}
+                      <div className="h-6 w-8 rounded-md border border-amber-400/40 bg-gradient-to-br from-amber-300/30 to-amber-600/20 p-1">
+                        <div className="h-full w-full rounded-[2px] border border-amber-300/30" />
+                      </div>
+                    </div>
+
+                    {/* ID-kaardi keskosa: portree siluett + andmed */}
+                    <div className="mt-3.5 flex items-center gap-3">
+                      <div className="flex h-16 w-14 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-zinc-400">
+                        <svg
+                          xmlns="http://w3.org"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="h-9 w-9 text-zinc-400"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div>
+                          <p className="text-[9px] uppercase tracking-wider text-zinc-500">
+                            NIMI / NAME
+                          </p>
+                          <p className="truncate text-xs font-extrabold uppercase text-white">
+                            {approvedChar.inGameName}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-[9px] uppercase tracking-wider text-zinc-500">
+                              VANUS
+                            </p>
+                            <p className="text-[11px] font-bold text-zinc-200">
+                              {approvedChar.age} a
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] uppercase tracking-wider text-zinc-500">
+                              DOK. NR
+                            </p>
+                            <p className="font-mono text-[11px] font-bold text-rose-300">
+                              {citizenCode}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ID-kaardi alumine masinloetav riba */}
+                    <div className="mt-3.5 border-t border-white/10 pt-2 font-mono text-[9px] tracking-widest text-zinc-500">
+                      IDSSA&lt;&lt;{citizenCode}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                    </div>
                   </div>
 
+                  {/* DETAILSED VÄLJAD PAREMAL */}
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-3.5">
                       <p className="text-[11px] uppercase tracking-wider text-zinc-500">
@@ -379,6 +438,7 @@ export default async function HomePage() {
               )}
             </section>
 
+            {/* ESITATUD AVALDUSED */}
             <section className="rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <div>
