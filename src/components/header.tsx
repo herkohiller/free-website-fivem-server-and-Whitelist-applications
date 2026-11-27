@@ -14,9 +14,19 @@ export function Header() {
   const isAdmin = (session?.user as { isAdmin?: boolean } | undefined)?.isAdmin;
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Kui kasutaja pole sisse logitud, ei kuva külgmenüüd üldse
-  if (status === "loading" || !session) {
-    return null;
+  // Kui kasutaja POLE Discordiga sisse logitud, näita ainult paremal üleval sisselogimisnuppu
+  if (status !== "authenticated" || !session?.user) {
+    if (status === "loading") return null;
+    return (
+      <div className="fixed top-5 right-5 z-50">
+        <Link
+          href="/api/auth/signin/discord"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#5865F2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#5865F2]/30 transition hover:bg-[#4752C4]"
+        >
+          Logi sisse Discordiga
+        </Link>
+      </div>
+    );
   }
 
   const navLinks = [
