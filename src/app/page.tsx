@@ -4,10 +4,10 @@ export const dynamic = "force-dynamic";
 
 // 👇 PANE SIIA OMA JUHTKONNA LIIKMETE DISCORDI ID-D:
 const LEADERSHIP_DISCORD_IDS = [
-  "123456789012345678",
-  "1428023982422102160",
-  "989929420099825715",
-  "1226573496860151999",
+  "ESIMESE_LIIKME_DISCORD_ID",
+  "TEISE_LIIKME_DISCORD_ID",
+  "KOLMANDA_LIIKME_DISCORD_ID",
+  "NELJANDA_LIIKME_DISCORD_ID",
 ];
 
 type LeaderProfile = {
@@ -16,22 +16,31 @@ type LeaderProfile = {
   avatar: string | null;
 };
 
+function makeAvatarSharp(url: string | null): string | null {
+  if (!url) return null;
+  if (url.includes("discordapp.com")) {
+    const baseUrl = url.split("?");
+    return `${baseUrl}?size=1024`;
+  }
+  return url;
+}
+
 function discordAvatarUrl(userId: string, avatarHash: string | null): string | null {
   if (!avatarHash) return null;
   const ext = avatarHash.startsWith("a_") ? "gif" : "png";
-  return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=512`;
+  return `https://discordapp.com{userId}/${avatarHash}.${ext}?size=1024`;
 }
 
 async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
   const cleanId = discordId.trim();
 
-  // 1. Proovime võtta otse Discordi API-st (värskeim nimi ja pilt)
+  // 1. Proovime võtta otse Discordi API-st (kõrgeima kvaliteediga pilt ja värskeim nimi)
   const botToken = process.env.DISCORD_BOT_TOKEN?.trim();
   if (botToken && cleanId) {
     try {
-      const res = await fetch(`https://discord.com/api/v10/users/${cleanId}`, {
+      const res = await fetch(`https://discord.com{cleanId}`, {
         headers: { Authorization: `Bot ${botToken}` },
-        next: { revalidate: 300 }, // Vahemällu 5 minutiks
+        next: { revalidate: 300 },
       });
       if (res.ok) {
         const data = (await res.json()) as {
@@ -50,7 +59,7 @@ async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
     }
   }
 
-  // 2. Varuvõimalus: otsime sinu veebilehe andmebaasist
+  // 2. Varuvõimalus: otsime veebilehe andmebaasist ja teeme pildi teravaks (?size=1024)
   try {
     const user = await prisma.user.findUnique({
       where: { discordId: cleanId },
@@ -60,7 +69,7 @@ async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
       return {
         discordId: cleanId,
         username: user.username,
-        avatar: user.avatar ?? null,
+        avatar: makeAvatarSharp(user.avatar ?? null),
       };
     }
   } catch {
@@ -128,7 +137,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 2. ALLAPOOLE KERIDES: JUHTKOND (AUTOMAATSELT DISCORDIST) */}
+      {/* 2. ALLAPOOLE KERIDES: JUHTKOND */}
       <section
         id="juhtkond"
         className="relative z-10 mx-auto max-w-6xl px-4 py-24 text-center"
@@ -143,12 +152,13 @@ export default async function HomePage() {
               key={`${leader.discordId}-${index}`}
               className="group flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1"
             >
-              {/* Discordi profiilipilt */}
+              {/* Terav Discordi profiilipilt */}
               <div className="aspect-square w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/90 shadow-xl">
                 {leader.avatar ? (
                   <img
                     src={leader.avatar}
                     alt={leader.username}
+                    loading="eager"
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 ) : (
