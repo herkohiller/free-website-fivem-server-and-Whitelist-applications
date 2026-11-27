@@ -1,33 +1,90 @@
-"use client";
+import { prisma } from "@/lib/prisma";
 
-import { signIn, useSession } from "next-auth/react";
+export const dynamic = "force-dynamic";
 
-type Leader = {
-  name: string;
-  image?: string;
-};
-
-const LEADERSHIP_MEMBERS: Leader[] = [
-  {
-    name: "Esimene nimi",
-    // image: "/juht1.png",
-  },
-  {
-    name: "Teine nimi",
-    // image: "/juht2.png",
-  },
-  {
-    name: "Kolmas nimi",
-    // image: "/juht3.png",
-  },
-  {
-    name: "Neljas nimi",
-    // image: "/juht4.png",
-  },
+const LEADERSHIP_DISCORD_IDS = [
+  "1428023982422102160",
+  "989929420099825715",
+  "1226573496860151999",
 ];
 
-export default function HomePage() {
-  const { data: session, status } = useSession();
+type LeaderProfile = {
+  discordId: string;
+  username: string;
+  avatar: string | null;
+};
+
+function makeAvatarSharp(url: string | null): string | null {
+  if (!url) return null;
+  if (url.includes("discordapp.com")) {
+    const baseUrl = url.split("?")[0];
+    return `${baseUrl}?size=1024`;
+  }
+  return url;
+}
+
+function discordAvatarUrl(userId: string, avatarHash: string | null): string | null {
+  if (!avatarHash) return null;
+  const ext = avatarHash.startsWith("a_") ? "gif" : "png";
+  return `https://discordapp.com{userId}/${avatarHash}.${ext}?size=1024`;
+}
+
+async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
+  const cleanId = discordId.trim();
+
+  // 1. Proovime võtta otse Discordi API-st (kõrgeima kvaliteediga pilt ja värskeim nimi)
+  const botToken = process.env.DISCORD_BOT_TOKEN?.trim();
+  if (botToken && cleanId) {
+    try {
+      const res = await fetch(`https://discord.com{cleanId}`, {
+        headers: { Authorization: `Bot ${botToken}` },
+        next: { revalidate: 300 },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as {
+          username?: string;
+          global_name?: string | null;
+          avatar?: string | null;
+        };
+        return {
+          discordId: cleanId,
+          username: data.global_name || data.username || "Teadmata",
+          avatar: discordAvatarUrl(cleanId, data.avatar ?? null),
+        };
+      }
+    } catch {
+      // Kui Discord API ei vasta, liigume edasi andmebaasi päringu juurde
+    }
+  }
+
+  // 2. Varuvõimalus: otsime veebilehe andmebaasist ja teeme pildi teravaks (?size=1024)
+  try {
+    const user = await prisma.user.findUnique({
+      where: { discordId: cleanId },
+      select: { username: true, avatar: true },
+    });
+    if (user) {
+      return {
+        discordId: cleanId,
+        username: user.username,
+        avatar: makeAvatarSharp(user.avatar ?? null),
+      };
+    }
+  } catch {
+    // Ignoreerime andmebaasi viga
+  }
+
+  return {
+    discordId: cleanId,
+    username: "Teadmata",
+    avatar: null,
+  };
+}
+
+export default async function HomePage() {
+  const leaders = await Promise.all(
+    LEADERSHIP_DISCORD_IDS.map((id) => resolveDiscordLeader(id))
+  );
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-zinc-950 text-white">
@@ -52,21 +109,8 @@ export default function HomePage() {
             <span className="h-5 w-0.5 shrink-0 bg-orange-500" />
           </div>
 
-          {/* Sisselogimise nupp (nähtav ainult enne sisselogimist) */}
-          {status !== "loading" && !session && (
-            <div className="mt-10 flex justify-center">
-              <button
-                type="button"
-                onClick={() => signIn("discord")}
-                className="cursor-pointer rounded-xl bg-[#5865F2] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#5865F2]/25 transition hover:bg-[#4752C4] sm:text-lg"
-              >
-                Logi sisse Discordiga
-              </button>
-            </div>
-          )}
-
           {/* Allapoole kerimise nool */}
-          <div className="mt-14 flex justify-center">
+          <div className="mt-16 flex justify-center">
             <a
               href="#juhtkond"
               aria-label="Keri juhtkonna juurde"
@@ -94,34 +138,37 @@ export default function HomePage() {
       {/* 2. ALLAPOOLE KERIDES: JUHTKOND */}
       <section
         id="juhtkond"
-        className="relative z-10 mx-auto max-w-6xl px-4 py-24 text-center"
+        className="relative z-10 mx-auto max-w-5xl px-4 py-24 text-center"
       >
         <h2 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
           Juhtkond
         </h2>
 
-        <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {LEADERSHIP_MEMBERS.map((leader, index) => (
+        <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {leaders.map((leader, index) => (
             <div
-              key={index}
+              key={`${leader.discordId}-${index}`}
               className="group flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1"
             >
+              {/* Terav Discordi profiilipilt */}
               <div className="aspect-square w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/90 shadow-xl">
-                {leader.image ? (
+                {leader.avatar ? (
                   <img
-                    src={leader.image}
-                    alt={leader.name}
+                    src={leader.avatar}
+                    alt={leader.username}
+                    loading="eager"
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-800/80 to-zinc-950 text-5xl font-extrabold text-orange-500/80">
-                    {leader.name.slice(0, 1).toUpperCase()}
+                    {leader.username.slice(0, 1).toUpperCase()}
                   </div>
                 )}
               </div>
 
+              {/* Discordi nimi */}
               <h3 className="mt-4 text-lg font-bold text-white">
-                {leader.name}
+                {leader.username}
               </h3>
             </div>
           ))}
