@@ -131,10 +131,11 @@ export default async function HomePage() {
   if (!session?.user) {
     return (
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden bg-zinc-950 px-4 text-center text-white">
-        <div
-          className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-25 blur-[2px]"
-          style={{ backgroundImage: "url('/taust2.png')" }}
-        />
+              <div
+        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20 blur-sm"
+        style={{ backgroundImage: "url('/taust2.png')" }}
+      />
+
         <div className="pointer-events-none fixed inset-0 z-0 bg-gradient-to-b from-zinc-950/70 via-zinc-950/85 to-zinc-950" />
 
         <div className="relative z-10 mx-auto max-w-4xl">
