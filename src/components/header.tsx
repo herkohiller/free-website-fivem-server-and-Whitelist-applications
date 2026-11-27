@@ -28,13 +28,15 @@ export function Header() {
     );
   }
 
-  const navLinks = [
+    const navLinks = [
     { href: "/", label: "Avaleht", icon: "🏠" },
     { href: "/rules", label: "Reeglid", icon: "📜" },
     { href: "/applications", label: "Minu avaldused", icon: "📄" },
+    { href: "/tickets", label: "Minu ticketid", icon: "🎫" },
     { href: "/apply", label: branding.whitelistNavLabel || "Whitelist", icon: "✍️" },
     { href: "/apply/staff", label: "Meeskond", icon: "🛡️" },
   ];
+
 
   if (isAdmin) {
     navLinks.push({ href: "/admin", label: "Admin", icon: "⚙️" });
