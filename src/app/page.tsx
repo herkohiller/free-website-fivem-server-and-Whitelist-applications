@@ -12,15 +12,15 @@ type LeadershipConfig = {
 // 👇 LISA SIIA OMA JUHTKONNA LIIKMETE DISCORDI ID-D:
 const LEADERSHIP_MEMBERS: LeadershipConfig[] = [
   {
-    discordId: "123456789012345678",
+    discordId: "1226573496860151999",
     fallbackName: "Juhatuse liige 1",
   },
   {
-    discordId: "234567890123456789",
+    discordId: "989929420099825715",
     fallbackName: "Juhatuse liige 2",
   },
   {
-    discordId: "345678901234567890",
+    discordId: "1428023982422102160",
     fallbackName: "Juhatuse liige 3",
   },
   {
