@@ -30,8 +30,20 @@ type Application = {
   reviewedByUser?: { username: string; avatar: string | null } | null;
 };
 
+const FILTER_LABELS: Record<"pending" | "device_check" | "approved" | "rejected" | "all", string> = {
+  pending: "Ootel",
+  device_check: "Seadmekontroll",
+  approved: "Kinnitatud",
+  rejected: "Tagasi lükatud",
+  all: "Kõik",
+};
+
 function getStatusLabel(status: string) {
-  return status === "device_check" ? "device check" : status;
+  if (status === "device_check") return "seadmekontroll";
+  if (status === "approved") return "kinnitatud";
+  if (status === "rejected") return "tagasi lükatud";
+  if (status === "pending") return "ootel";
+  return status;
 }
 
 function getStatusClassName(status: string) {
@@ -100,7 +112,7 @@ export function AdminApplicationList() {
     : filtered;
 
   if (loading) {
-    return <p className="text-zinc-500">Loading applications...</p>;
+    return <p className="text-zinc-500">Avalduste laadimine...</p>;
   }
 
   return (
@@ -114,7 +126,7 @@ export function AdminApplicationList() {
             setRejectModalId(null);
           }
         }}
-        title="Reject whitelist application"
+        title="Lükka whitelist-avaldus tagasi"
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
@@ -129,7 +141,7 @@ export function AdminApplicationList() {
                   : "border border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
               }`}
             >
-              {f}
+              {FILTER_LABELS[f]}
             </button>
           ))}
         </div>
@@ -138,14 +150,14 @@ export function AdminApplicationList() {
             type="text"
             value={discordSearch}
             onChange={(e) => setDiscordSearch(e.target.value)}
-            placeholder="Search by Discord ID"
+            placeholder="Otsi Discordi ID järgi"
             className="w-full rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
           />
         </div>
       </div>
       {filteredByDiscord.length === 0 ? (
         <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-8 text-center text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-500">
-          No applications match this view.
+          Sellele vaatele ei vasta ükski avaldus.
         </div>
       ) : (
         <ul className="space-y-4">
@@ -192,12 +204,12 @@ export function AdminApplicationList() {
                   <div className="border-t border-zinc-800 p-4 space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2 text-sm">
                       <div>
-                        <span className="text-zinc-500">Submitted</span>
-                        <p className="text-zinc-200">{new Date(app.createdAt).toLocaleString()}</p>
+                        <span className="text-zinc-500">Esitatud</span>
+                        <p className="text-zinc-200">{new Date(app.createdAt).toLocaleString("et-EE")}</p>
                       </div>
                       <div>
-                        <span className="text-zinc-500">IP address</span>
-                        <p className="font-mono text-zinc-200">{app.submitterIp ?? "Unknown"}</p>
+                        <span className="text-zinc-500">IP-aadress</span>
+                        <p className="font-mono text-zinc-200">{app.submitterIp ?? "Teadmata"}</p>
                       </div>
                     </div>
                     {questions.map((question) => (
@@ -212,10 +224,10 @@ export function AdminApplicationList() {
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-zinc-800 pt-4 text-sm">
                         <span className="text-zinc-500">
                           {app.status === "approved"
-                            ? "Accepted"
+                            ? "Kinnitas"
                             : app.status === "device_check"
-                              ? "Marked for device check"
-                              : "Rejected"} by{" "}
+                              ? "Märkis seadmekontrolli"
+                              : "Lükkas tagasi"}{" "}
                           {app.reviewedByUser ? (
                             <span className="inline-flex items-center gap-1.5 text-zinc-300">
                               {app.reviewedByUser.avatar ? (
@@ -229,7 +241,7 @@ export function AdminApplicationList() {
                         </span>
                         {app.reviewedAt && (
                           <span className="text-zinc-500">
-                            {new Date(app.reviewedAt).toLocaleString()}
+                            {new Date(app.reviewedAt).toLocaleString("et-EE")}
                           </span>
                         )}
                       </div>
@@ -241,21 +253,21 @@ export function AdminApplicationList() {
                           onClick={() => updateStatus(app.id, "device_check")}
                           className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-yellow-400"
                         >
-                          Device check
+                          Seadmekontroll
                         </button>
                         <button
                           type="button"
                           onClick={() => updateStatus(app.id, "approved")}
                           className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
                         >
-                          Approve
+                          Kinnita
                         </button>
                         <button
                           type="button"
                           onClick={() => setRejectModalId(app.id)}
                           className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
                         >
-                          Reject
+                          Lükka tagasi
                         </button>
                       </div>
                     )}
