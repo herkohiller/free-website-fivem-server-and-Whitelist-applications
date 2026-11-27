@@ -16,24 +16,22 @@ type FivemServerInfo = {
   players: number;
   maxPlayers: number;
   connectCode: string;
-  topPlayers: Array<FivemPlayer>;
+  topPlayers: FivemPlayer[];
 };
-
-type UserApplication = NonNullable<
-  Awaited<ReturnType<typeof prisma.application.findFirst>>
->;
 
 async function getFivemServerInfo(
   serverCode: string | null | undefined
 ): Promise<FivemServerInfo> {
   const code = (serverCode || "").trim().replace(/^cfx\.re\/join\//i, "");
+  const emptyPlayers: FivemPlayer[] = [];
+
   if (!code) {
     return {
       online: false,
       players: 0,
       maxPlayers: 64,
       connectCode: "",
-      topPlayers: new Array<FivemPlayer>(),
+      topPlayers: emptyPlayers,
     };
   }
 
@@ -52,7 +50,7 @@ async function getFivemServerInfo(
         players: 0,
         maxPlayers: 64,
         connectCode: code,
-        topPlayers: new Array<FivemPlayer>(),
+        topPlayers: emptyPlayers,
       };
     }
 
@@ -60,14 +58,12 @@ async function getFivemServerInfo(
       Data?: {
         clients?: number;
         sv_maxclients?: number;
-        players?: Array<{ name?: string; id?: number; ping?: number }>;
+        players?: { name?: string; id?: number; ping?: number }[];
       };
     };
 
     const data = json.Data;
-    const rawPlayers = Array.isArray(data?.players)
-      ? data.players
-      : new Array<{ name?: string; id?: number; ping?: number }>();
+    const rawPlayers = Array.isArray(data?.players) ? data.players : [];
 
     return {
       online: true,
@@ -88,7 +84,7 @@ async function getFivemServerInfo(
       players: 0,
       maxPlayers: 64,
       connectCode: code,
-      topPlayers: new Array<FivemPlayer>(),
+      topPlayers: emptyPlayers,
     };
   }
 }
@@ -154,13 +150,14 @@ export default async function HomePage() {
   const resolved = await resolveSessionUserId(session);
   const userId = resolved.ok ? resolved.userId : null;
 
-  let userApplications: Array<UserApplication> = new Array();
-  if (userId) {
-    userApplications = await prisma.application.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    });
-  }
+  const userApplications = userId
+    ? await prisma.application.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+      })
+    : await prisma.application.findMany({
+        where: { id: "__none__" },
+      });
 
   const recentMembers = await prisma.user.findMany({
     orderBy: { lastActiveAt: "desc" },
@@ -181,7 +178,7 @@ export default async function HomePage() {
 
   const approvedChar =
     userApplications.find((a) => a.status === "approved") ??
-    userApplications.at(0) ??
+    userApplications[0] ??
     null;
   const citizenId = approvedChar
     ? `SSA${approvedChar.id.slice(-5).toUpperCase()}`
@@ -198,7 +195,7 @@ export default async function HomePage() {
         }))
       : recentMembers.map((m, idx) => ({
           rank: idx + 1,
-          primaryName: m.applications.at(0)?.inGameName || m.username,
+          primaryName: m.applications[0]?.inGameName || m.username,
           secondaryName: m.username,
           rightValue: `#${idx + 1}`,
           rightLabel: "KOHT",
