@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function TicketsPage() {
-  const [tickets, setTickets] = useState<any>();
+  const [tickets, setTickets] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -16,12 +16,15 @@ export default function TicketsPage() {
 
   const fetchTickets = async () => {
     const res = await fetch("/api/tickets");
-    if (res.ok) setTickets(await res.json());
+    if (res.ok) {
+      const data = await res.json();
+      setTickets(Array.isArray(data) ? data : []);
+    }
   };
 
   useEffect(() => {
     fetchTickets();
-  },);
+  }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
