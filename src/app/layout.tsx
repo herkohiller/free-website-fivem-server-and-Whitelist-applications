@@ -51,9 +51,13 @@ export default async function RootLayout({
               <ToastProvider>
                 <SiteActivityTracker />
                 <TopBanner />
-                <Header />
-                <main className="flex-1 w-full">{children}</main>
-                <Footer />
+                <div className="flex min-h-screen flex-1 flex-col md:flex-row">
+                  <Header />
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <main className="flex-1 w-full">{children}</main>
+                    <Footer />
+                  </div>
+                </div>
               </ToastProvider>
             </AuthSessionProvider>
           </ThemeProvider>
