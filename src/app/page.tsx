@@ -12,7 +12,7 @@ export default function HomePage() {
         {/* Vasakul: logo */}
         <div className="flex-shrink-0">
           <img
-            src="/taust.png"
+            src="/taust2.png"
             alt="Streets of San Andreas RP"
             className="h-64 w-64 rounded-full object-contain drop-shadow-[0_0_35px_rgba(245,158,11,0.35)] sm:h-80 sm:w-80 md:h-[420px] md:w-[420px]"
           />
