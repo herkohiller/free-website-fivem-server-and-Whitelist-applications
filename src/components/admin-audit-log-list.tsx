@@ -59,30 +59,30 @@ export function AdminAuditLogList() {
   }, [logs, search]);
 
   if (loading) {
-    return <p className="text-zinc-500">Loading logs...</p>;
+    return <p className="text-zinc-500">Logide laadimine...</p>;
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-zinc-100">Audit logs</h3>
+          <h3 className="text-lg font-semibold text-zinc-100">Auditilogid</h3>
           <p className="text-sm text-zinc-500">
-            Recent application events, review actions, and admin changes.
+            Viimased avaldustega seotud sündmused, ülevaatamised ja administraatorite muudatused.
           </p>
         </div>
         <input
           type="text"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by action, Discord ID, IP..."
+          placeholder="Otsi tegevuse, Discordi ID või IP järgi..."
           className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-base text-zinc-100 placeholder-zinc-500 focus:border-[var(--accent)] focus:outline-none sm:max-w-sm"
         />
       </div>
 
       {filteredLogs.length === 0 ? (
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 text-sm text-zinc-500">
-          No logs match this search.
+          Otsingule vastavaid logisid ei leitud.
         </div>
       ) : (
         <div className="space-y-3">
@@ -100,7 +100,7 @@ export function AdminAuditLogList() {
                     <span className="text-sm text-zinc-400">{log.entityType}</span>
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-                    <span>{new Date(log.createdAt).toLocaleString()}</span>
+                    <span>{new Date(log.createdAt).toLocaleString("et-EE")}</span>
                     {log.ipAddress && <span>IP: {log.ipAddress}</span>}
                     {log.entityId && <span>ID: {log.entityId}</span>}
                   </div>
@@ -123,12 +123,12 @@ export function AdminAuditLogList() {
 
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 text-sm">
-                  <p className="text-xs uppercase tracking-wide text-zinc-500">Actor</p>
-                  <p className="mt-1 text-zinc-200">{log.actorDiscordId ?? "Unknown"}</p>
+                  <p className="text-xs uppercase tracking-wide text-zinc-500">Teostaja</p>
+                  <p className="mt-1 text-zinc-200">{log.actorDiscordId ?? "Teadmata"}</p>
                 </div>
                 <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 text-sm">
-                  <p className="text-xs uppercase tracking-wide text-zinc-500">Target</p>
-                  <p className="mt-1 text-zinc-200">{log.targetDiscordId ?? "N/A"}</p>
+                  <p className="text-xs uppercase tracking-wide text-zinc-500">Sihtmärk</p>
+                  <p className="mt-1 text-zinc-200">{log.targetDiscordId ?? "Puudub"}</p>
                 </div>
               </div>
 
