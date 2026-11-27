@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function TicketsPage() {
-  const [tickets, setTickets] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<Array<any>>(new Array());
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -15,16 +15,20 @@ export default function TicketsPage() {
   const [evidenceUrl, setEvidenceUrl] = useState("");
 
   const fetchTickets = async () => {
-    const res = await fetch("/api/tickets");
-    if (res.ok) {
-      const data = await res.json();
-      setTickets(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch("/api/tickets");
+      if (res.ok) {
+        const data = await res.json();
+        setTickets(Array.isArray(data) ? data : new Array());
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   useEffect(() => {
     fetchTickets();
-  }, []);
+  }, new Array());
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +78,7 @@ export default function TicketsPage() {
 
       {/* Ticketite nimekiri */}
       <div className="bg-[#111216] border border-zinc-800/80 rounded-2xl p-5 space-y-3">
-        {tickets.length === 0 ? (
+        {!tickets || tickets.length === 0 ? (
           <p className="text-zinc-500 text-sm py-8 text-center">Sul pole veel ühtegi ticketit loodud.</p>
         ) : (
           tickets.map((t: any) => (
