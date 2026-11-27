@@ -10,10 +10,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
   const { id } = await params;
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isAdmin: true },
+  });
+
   const ticket = await prisma.ticket.findUnique({
     where: { id },
     include: {
       user: { select: { id: true, username: true, avatar: true } },
+      claimedBy: { select: { id: true, username: true, avatar: true } },
       messages: {
         include: { user: { select: { id: true, username: true, avatar: true } } },
         orderBy: { createdAt: "asc" },
@@ -26,7 +32,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ error: "Ticketit ei leitud" }, { status: 404 });
   }
 
-  return NextResponse.json(ticket);
+  return NextResponse.json({ ticket, isAdmin: Boolean(dbUser?.isAdmin) });
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -40,13 +46,47 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   const dbUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { isAdmin: true },
+    select: { isAdmin: true, username: true },
   });
   const isAdmin = Boolean(dbUser?.isAdmin);
 
   const ticket = await prisma.ticket.findUnique({ where: { id } });
   if (!ticket) {
     return NextResponse.json({ error: "Ei leitud" }, { status: 404 });
+  }
+
+  // Ticketi claimimine (ainult admin)
+  if (action === "CLAIM" && isAdmin) {
+    const updated = await prisma.ticket.update({
+      where: { id },
+      data: {
+        claimedById: session.user.id,
+        logs: {
+          create: {
+            action: "Ticket claimitud",
+            details: `${dbUser?.username} võttis ticketi enda peale.`,
+          },
+        },
+      },
+    });
+    return NextResponse.json(updated);
+  }
+
+  // Claimi vabastamine (ainult admin)
+  if (action === "UNCLAIM" && isAdmin) {
+    const updated = await prisma.ticket.update({
+      where: { id },
+      data: {
+        claimedById: null,
+        logs: {
+          create: {
+            action: "Claim eemaldatud",
+            details: `${dbUser?.username} vabastas ticketi.`,
+          },
+        },
+      },
+    });
+    return NextResponse.json(updated);
   }
 
   // Ticketi sulgemine
@@ -58,7 +98,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         logs: {
           create: {
             action: "Staatus muudetud",
-            details: `${ticket.status} -> Suletud`,
+            details: `${ticket.status} -> Suletud (${dbUser?.username})`,
           },
         },
       },
@@ -77,6 +117,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     where: { id },
     data: {
       status: newStatus,
+      claimedById: isAdmin && !ticket.claimedById ? session.user.id : ticket.claimedById,
       messages: {
         create: {
           content,
@@ -97,4 +138,26 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   });
 
   return NextResponse.json(updated);
+}
+
+// Ticketi kustutamine (ainult admin)
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Pole lubatud" }, { status: 401 });
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isAdmin: true },
+  });
+
+  if (!dbUser?.isAdmin) {
+    return NextResponse.json({ error: "Ainult admin saab kustutada" }, { status: 403 });
+  }
+
+  const { id } = await params;
+  await prisma.ticket.delete({ where: { id } });
+
+  return NextResponse.json({ success: true });
 }
