@@ -107,9 +107,10 @@ export default function AdminPage() {
           {activeTab === "whitelist" && <AdminApplicationList />}
           {activeTab === "staff" && <AdminStaffApplicationList />}
           {activeTab === "rules" && <AdminRulesManager />}
-          {activeTab === "members" && (
-            <AdminMembersList isFullAdmin={isFullAdmin} />
-          )}
+        {activeTab === "members" && (
+  <AdminMembersList isFullAdmin={isFullAdmin} />
+)}
+
           {activeTab === "branding" && <AdminBrandingSettings />}
           {activeTab === "logs" && <AdminAuditLogList />}
         </div>
