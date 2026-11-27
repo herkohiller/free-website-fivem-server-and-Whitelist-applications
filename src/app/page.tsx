@@ -1,31 +1,84 @@
-"use client";
+import { prisma } from "@/lib/prisma";
 
-type Leader = {
-  name: string;
-  image?: string; // Valikuline: nt "/juht1.png" (kaustast public) või pildi URL
-};
+export const dynamic = "force-dynamic";
 
-// 👇 PANE SIIA OMA JUHTKONNA LIIKMETE NIMED (JA SOOVI KORRAL PILDID):
-const LEADERSHIP_MEMBERS: Leader[] = [
-  {
-    name: "Esimene nimi",
-    // image: "/juht1.png",
-  },
-  {
-    name: "Teine nimi",
-    // image: "/juht2.png",
-  },
-  {
-    name: "Kolmas nimi",
-    // image: "/juht3.png",
-  },
-  {
-    name: "Neljas nimi",
-    // image: "/juht4.png",
-  },
+// 👇 PANE SIIA OMA JUHTKONNA LIIKMETE DISCORDI ID-D:
+const LEADERSHIP_DISCORD_IDS = [
+  "123456789012345678",
+  "1428023982422102160",
+  "989929420099825715",
+  "1226573496860151999",
 ];
 
-export default function HomePage() {
+type LeaderProfile = {
+  discordId: string;
+  username: string;
+  avatar: string | null;
+};
+
+function discordAvatarUrl(userId: string, avatarHash: string | null): string | null {
+  if (!avatarHash) return null;
+  const ext = avatarHash.startsWith("a_") ? "gif" : "png";
+  return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=512`;
+}
+
+async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
+  const cleanId = discordId.trim();
+
+  // 1. Proovime võtta otse Discordi API-st (värskeim nimi ja pilt)
+  const botToken = process.env.DISCORD_BOT_TOKEN?.trim();
+  if (botToken && cleanId) {
+    try {
+      const res = await fetch(`https://discord.com/api/v10/users/${cleanId}`, {
+        headers: { Authorization: `Bot ${botToken}` },
+        next: { revalidate: 300 }, // Vahemällu 5 minutiks
+      });
+      if (res.ok) {
+        const data = (await res.json()) as {
+          username?: string;
+          global_name?: string | null;
+          avatar?: string | null;
+        };
+        return {
+          discordId: cleanId,
+          username: data.global_name || data.username || "Teadmata",
+          avatar: discordAvatarUrl(cleanId, data.avatar ?? null),
+        };
+      }
+    } catch {
+      // Kui Discord API ei vasta, liigume edasi andmebaasi päringu juurde
+    }
+  }
+
+  // 2. Varuvõimalus: otsime sinu veebilehe andmebaasist
+  try {
+    const user = await prisma.user.findUnique({
+      where: { discordId: cleanId },
+      select: { username: true, avatar: true },
+    });
+    if (user) {
+      return {
+        discordId: cleanId,
+        username: user.username,
+        avatar: user.avatar ?? null,
+      };
+    }
+  } catch {
+    // Ignoreerime andmebaasi viga
+  }
+
+  return {
+    discordId: cleanId,
+    username: "Teadmata",
+    avatar: null,
+  };
+}
+
+export default async function HomePage() {
+  const leaders = await Promise.all(
+    LEADERSHIP_DISCORD_IDS.map((id) => resolveDiscordLeader(id))
+  );
+
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-zinc-950 text-white">
       {/* Taustapilt koos tumeda hajutusega */}
@@ -35,7 +88,7 @@ export default function HomePage() {
       />
       <div className="pointer-events-none fixed inset-0 z-0 bg-gradient-to-b from-zinc-950/70 via-zinc-950/85 to-zinc-950" />
 
-      {/* 1. ÜLEMINE VAADE (HERO) – AINULT PEALKIRI, TSITAAT JA NOOL */}
+      {/* 1. ÜLEMINE VAADE (HERO) */}
       <section className="relative z-10 flex min-h-[calc(100vh-4.5rem)] flex-col items-center justify-center px-4 py-16 text-center">
         <div className="mx-auto max-w-4xl">
           <h1 className="text-4xl font-black uppercase tracking-tight sm:text-6xl md:text-7xl">
@@ -75,7 +128,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. ALLAPOOLE KERIDES: JUHTKOND */}
+      {/* 2. ALLAPOOLE KERIDES: JUHTKOND (AUTOMAATSELT DISCORDIST) */}
       <section
         id="juhtkond"
         className="relative z-10 mx-auto max-w-6xl px-4 py-24 text-center"
@@ -85,29 +138,29 @@ export default function HomePage() {
         </h2>
 
         <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {LEADERSHIP_MEMBERS.map((leader, index) => (
+          {leaders.map((leader, index) => (
             <div
-              key={index}
+              key={`${leader.discordId}-${index}`}
               className="group flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1"
             >
-              {/* Profiilipilt või nimetäht */}
+              {/* Discordi profiilipilt */}
               <div className="aspect-square w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/90 shadow-xl">
-                {leader.image ? (
+                {leader.avatar ? (
                   <img
-                    src={leader.image}
-                    alt={leader.name}
+                    src={leader.avatar}
+                    alt={leader.username}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-800/80 to-zinc-950 text-5xl font-extrabold text-orange-500/80">
-                    {leader.name.slice(0, 1).toUpperCase()}
+                    {leader.username.slice(0, 1).toUpperCase()}
                   </div>
                 )}
               </div>
 
-              {/* Nimi */}
+              {/* Discordi nimi */}
               <h3 className="mt-4 text-lg font-bold text-white">
-                {leader.name}
+                {leader.username}
               </h3>
             </div>
           ))}
