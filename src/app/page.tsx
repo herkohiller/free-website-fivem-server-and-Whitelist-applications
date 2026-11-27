@@ -1,96 +1,31 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-
-type LeadershipConfig = {
-  discordId: string;
-  fallbackName?: string;
+type Leader = {
+  name: string;
+  image?: string; // Valikuline: nt "/juht1.png" (kaustast public) või pildi URL
 };
 
-// 👇 LISA SIIA OMA JUHTKONNA LIIKMETE DISCORDI ID-D:
-const LEADERSHIP_MEMBERS: LeadershipConfig[] = [
+// 👇 PANE SIIA OMA JUHTKONNA LIIKMETE NIMED (JA SOOVI KORRAL PILDID):
+const LEADERSHIP_MEMBERS: Leader[] = [
   {
-    discordId: "1226573496860151999",
-    fallbackName: "Juhatuse liige 1",
+    name: "Esimene nimi",
+    // image: "/juht1.png",
   },
   {
-    discordId: "989929420099825715",
-    fallbackName: "Juhatuse liige 2",
+    name: "Teine nimi",
+    // image: "/juht2.png",
   },
   {
-    discordId: "1428023982422102160",
-    fallbackName: "Juhatuse liige 3",
+    name: "Kolmas nimi",
+    // image: "/juht3.png",
   },
   {
-    discordId: "456789012345678901",
-    fallbackName: "Juhatuse liige 4",
+    name: "Neljas nimi",
+    // image: "/juht4.png",
   },
 ];
 
-type ResolvedLeader = LeadershipConfig & {
-  username: string;
-  avatar: string | null;
-};
-
 export default function HomePage() {
-  const { data: session, status } = useSession();
-  const [leaders, setLeaders] = useState<ResolvedLeader[]>(
-    LEADERSHIP_MEMBERS.map((m) => ({
-      ...m,
-      username: m.fallbackName ?? "Laadimine...",
-      avatar: null,
-    }))
-  );
-
-  useEffect(() => {
-    let active = true;
-
-    async function fetchDiscordProfiles() {
-      const results = await Promise.all(
-        LEADERSHIP_MEMBERS.map(async (member) => {
-          try {
-            const res = await fetch(
-              `/api/members/lookup?discordId=${encodeURIComponent(member.discordId)}`
-            );
-            if (!res.ok) {
-              return {
-                ...member,
-                username: member.fallbackName ?? "Teadmata",
-                avatar: null,
-              };
-            }
-            const data = (await res.json()) as {
-              username?: string | null;
-              avatar?: string | null;
-            };
-            return {
-              ...member,
-              username: data.username || member.fallbackName || "Teadmata",
-              avatar: data.avatar ?? null,
-            };
-          } catch {
-            return {
-              ...member,
-              username: member.fallbackName ?? "Teadmata",
-              avatar: null,
-            };
-          }
-        })
-      );
-
-      if (active) {
-        setLeaders(results);
-      }
-    }
-
-    void fetchDiscordProfiles();
-    return () => {
-      active = false;
-    };
-  }, []);
-
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-zinc-950 text-white">
       {/* Taustapilt koos tumeda hajutusega */}
@@ -100,92 +35,22 @@ export default function HomePage() {
       />
       <div className="pointer-events-none fixed inset-0 z-0 bg-gradient-to-b from-zinc-950/70 via-zinc-950/85 to-zinc-950" />
 
-      {/* 1. ÜLEMINE VAADE (HERO) */}
+      {/* 1. ÜLEMINE VAADE (HERO) – AINULT PEALKIRI, TSITAAT JA NOOL */}
       <section className="relative z-10 flex min-h-[calc(100vh-4.5rem)] flex-col items-center justify-center px-4 py-16 text-center">
         <div className="mx-auto max-w-4xl">
-          {/* Suur pealkiri */}
           <h1 className="text-4xl font-black uppercase tracking-tight sm:text-6xl md:text-7xl">
             <span className="text-white">STREETS OF </span>
             <span className="text-orange-500">SAN ANDREAS</span>
           </h1>
 
-          {/* Tsitaat / alapealkiri */}
           <div className="mx-auto mt-6 flex max-w-2xl items-center justify-center gap-3 text-sm italic text-zinc-300 sm:text-base">
             <span className="h-5 w-0.5 shrink-0 bg-orange-500" />
             <p>&ldquo;Sinu lugu, sinu valikud, sinu linn — liitu meiega juba täna!&rdquo;</p>
             <span className="h-5 w-0.5 shrink-0 bg-orange-500" />
           </div>
 
-          {/* Info- ja tegevuskast */}
-          <div className="mx-auto mt-10 max-w-md rounded-2xl border border-orange-500/20 bg-zinc-900/75 p-6 shadow-[0_0_40px_rgba(249,115,22,0.08)] backdrop-blur-md">
-            <div className="grid grid-cols-2 gap-4 text-left">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Serveri staatus
-                </p>
-                <p className="mt-1 text-2xl font-extrabold text-orange-500">
-                  AVATUD <span className="text-xs font-normal text-zinc-300">24/7</span>
-                </p>
-                <div className="mt-2 h-1 w-full rounded-full bg-orange-500" />
-              </div>
-
-              <div className="border-l border-zinc-800 pl-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Whitelist
-                </p>
-                <p className="mt-1 text-2xl font-extrabold text-white">
-                  AKTIIVNE
-                </p>
-                <p className="mt-1 text-xs text-zinc-400">Esita avaldus</p>
-              </div>
-            </div>
-
-            {/* Tegevusnupud */}
-            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
-              {status === "loading" ? (
-                <button
-                  disabled
-                  className="w-full rounded-xl bg-zinc-800 px-5 py-3 text-sm font-semibold text-zinc-400"
-                >
-                  Laadimine...
-                </button>
-              ) : session ? (
-                <>
-                  <Link
-                    href="/apply"
-                    className="flex-1 rounded-xl bg-orange-600 px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-orange-500"
-                  >
-                    Taotle Whitelisti
-                  </Link>
-                  <Link
-                    href="/rules"
-                    className="flex-1 rounded-xl border border-zinc-700 bg-zinc-800/80 px-5 py-3 text-center text-sm font-bold text-zinc-100 transition hover:border-zinc-500 hover:bg-zinc-800"
-                  >
-                    Loe reegleid
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => signIn("discord")}
-                    className="flex-1 cursor-pointer rounded-xl bg-[#5865F2] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#4752C4]"
-                  >
-                    Logi sisse Discordiga
-                  </button>
-                  <Link
-                    href="/rules"
-                    className="flex-1 rounded-xl border border-zinc-700 bg-zinc-800/80 px-5 py-3 text-center text-sm font-bold text-zinc-100 transition hover:border-zinc-500 hover:bg-zinc-800"
-                  >
-                    Loe reegleid
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-
           {/* Allapoole kerimise nool */}
-          <div className="mt-14 flex justify-center">
+          <div className="mt-16 flex justify-center">
             <a
               href="#juhtkond"
               aria-label="Keri juhtkonna juurde"
@@ -210,7 +75,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. ALLAPOOLE KERIDES: JUHTKOND (AINULT PILT JA NIMI) */}
+      {/* 2. ALLAPOOLE KERIDES: JUHTKOND */}
       <section
         id="juhtkond"
         className="relative z-10 mx-auto max-w-6xl px-4 py-24 text-center"
@@ -219,31 +84,30 @@ export default function HomePage() {
           Juhtkond
         </h2>
 
-        {/* Juhtkonna kaartide ruudustik */}
         <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {leaders.map((leader) => (
+          {LEADERSHIP_MEMBERS.map((leader, index) => (
             <div
-              key={leader.discordId}
+              key={index}
               className="group flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1"
             >
-              {/* Profiilipilt */}
-              <div className="aspect-square w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl">
-                {leader.avatar ? (
+              {/* Profiilipilt või nimetäht */}
+              <div className="aspect-square w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/90 shadow-xl">
+                {leader.image ? (
                   <img
-                    src={leader.avatar}
-                    alt={leader.username}
+                    src={leader.image}
+                    alt={leader.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900 text-4xl font-bold text-zinc-600">
-                    {leader.username.slice(0, 1).toUpperCase()}
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-800/80 to-zinc-950 text-5xl font-extrabold text-orange-500/80">
+                    {leader.name.slice(0, 1).toUpperCase()}
                   </div>
                 )}
               </div>
 
-              {/* Ainult nimi */}
+              {/* Nimi */}
               <h3 className="mt-4 text-lg font-bold text-white">
-                {leader.username}
+                {leader.name}
               </h3>
             </div>
           ))}
