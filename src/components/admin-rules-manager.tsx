@@ -31,7 +31,7 @@ export function AdminRulesManager() {
     try {
       const res = await fetch("/api/admin/rules");
       if (!res.ok) {
-        toast.addToast(await apiErrorMessage(res, "Failed to load rules"), "error");
+        toast.addToast(await apiErrorMessage(res, "Reeglite laadimine ebaõnnestus"), "error");
         return;
       }
       const data = (await res.json()) as RuleCategoryDTO[];
@@ -41,7 +41,7 @@ export function AdminRulesManager() {
         return data[0]?.id ?? null;
       });
     } catch {
-      toast.addToast("Failed to load rules", "error");
+      toast.addToast("Reeglite laadimine ebaõnnestus", "error");
     } finally {
       setLoading(false);
     }
@@ -60,7 +60,7 @@ export function AdminRulesManager() {
     e.preventDefault();
     const title = catTitle.trim();
     if (!title) {
-      toast.addToast("Category title required", "error");
+      toast.addToast("Kategooria pealkiri on kohustuslik", "error");
       return;
     }
     const sortOrder = Number.parseInt(catSort, 10);
@@ -72,32 +72,32 @@ export function AdminRulesManager() {
         body: JSON.stringify({ title, sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0 }),
       });
       if (!res.ok) {
-        toast.addToast(await apiErrorMessage(res, "Could not create category"), "error");
+        toast.addToast(await apiErrorMessage(res, "Kategooria loomine ebaõnnestus"), "error");
         return;
       }
-      toast.addToast("Category created", "success");
+      toast.addToast("Kategooria loodud", "success");
       setCatTitle("");
       setCatSort("0");
       await load();
     } catch {
-      toast.addToast("Could not create category", "error");
+      toast.addToast("Kategooria loomine ebaõnnestus", "error");
     } finally {
       setSavingCat(false);
     }
   }
 
   async function handleDeleteCategory(id: string) {
-    if (!confirm("Delete this category and all of its rule sections?")) return;
+    if (!confirm("Kas kustutada see kategooria ja kõik selle reeglijaotised?")) return;
     try {
       const res = await fetch(`/api/admin/rules/categories/${id}`, { method: "DELETE" });
       if (!res.ok) {
-        toast.addToast(await apiErrorMessage(res, "Delete failed"), "error");
+        toast.addToast(await apiErrorMessage(res, "Kustutamine ebaõnnestus"), "error");
         return;
       }
-      toast.addToast("Category deleted", "success");
+      toast.addToast("Kategooria kustutatud", "success");
       await load();
     } catch {
-      toast.addToast("Delete failed", "error");
+      toast.addToast("Kustutamine ebaõnnestus", "error");
     }
   }
 
@@ -109,13 +109,13 @@ export function AdminRulesManager() {
         body: JSON.stringify({ title, sortOrder }),
       });
       if (!res.ok) {
-        toast.addToast(await apiErrorMessage(res, "Update failed"), "error");
+        toast.addToast(await apiErrorMessage(res, "Uuendamine ebaõnnestus"), "error");
         return;
       }
-      toast.addToast("Category updated", "success");
+      toast.addToast("Kategooria uuendatud", "success");
       await load();
     } catch {
-      toast.addToast("Update failed", "error");
+      toast.addToast("Uuendamine ebaõnnestus", "error");
     }
   }
 
@@ -138,12 +138,12 @@ export function AdminRulesManager() {
   async function handleSaveSection(e: FormEvent) {
     e.preventDefault();
     if (!selectedCategoryId) {
-      toast.addToast("Select a category first", "error");
+      toast.addToast("Vali esmalt kategooria", "error");
       return;
     }
     const title = secTitle.trim();
     if (!title) {
-      toast.addToast("Section title required", "error");
+      toast.addToast("Jaotise pealkiri on kohustuslik", "error");
       return;
     }
     const sortOrder = Number.parseInt(secSort, 10);
@@ -161,10 +161,10 @@ export function AdminRulesManager() {
           }),
         });
         if (!res.ok) {
-          toast.addToast(await apiErrorMessage(res, "Could not update section"), "error");
+          toast.addToast(await apiErrorMessage(res, "Jaotise uuendamine ebaõnnestus"), "error");
           return;
         }
-        toast.addToast("Section updated", "success");
+        toast.addToast("Jaotis uuendatud", "success");
       } else {
         const res = await fetch("/api/admin/rules/sections", {
           method: "POST",
@@ -178,61 +178,60 @@ export function AdminRulesManager() {
           }),
         });
         if (!res.ok) {
-          toast.addToast(await apiErrorMessage(res, "Could not create section"), "error");
+          toast.addToast(await apiErrorMessage(res, "Jaotise loomine ebaõnnestus"), "error");
           return;
         }
-        toast.addToast("Section created", "success");
+        toast.addToast("Jaotis loodud", "success");
       }
       clearSectionForm();
       await load();
     } catch {
-      toast.addToast("Could not save section", "error");
+      toast.addToast("Jaotise salvestamine ebaõnnestus", "error");
     } finally {
       setSavingSec(false);
     }
   }
 
   async function handleDeleteSection(id: string) {
-    if (!confirm("Delete this rule section?")) return;
+    if (!confirm("Kas kustutada see reeglijaotis?")) return;
     try {
       const res = await fetch(`/api/admin/rules/sections/${id}`, { method: "DELETE" });
       if (!res.ok) {
-        toast.addToast(await apiErrorMessage(res, "Delete failed"), "error");
+        toast.addToast(await apiErrorMessage(res, "Kustutamine ebaõnnestus"), "error");
         return;
       }
-      toast.addToast("Section deleted", "success");
+      toast.addToast("Jaotis kustutatud", "success");
       if (editingSectionId === id) clearSectionForm();
       await load();
     } catch {
-      toast.addToast("Delete failed", "error");
+      toast.addToast("Kustutamine ebaõnnestus", "error");
     }
   }
 
   if (loading) {
-    return <p className="text-sm text-zinc-500">Loading rules…</p>;
+    return <p className="text-sm text-zinc-500">Reeglite laadimine…</p>;
   }
 
   return (
     <div className="space-y-8">
       <p className="text-sm text-zinc-400">
-        Full admins can organize <strong className="text-zinc-200">categories</strong> (e.g. General, Roleplay,
-        Illegal) and <strong className="text-zinc-200">sections</strong> (numbered entries with full text). Visitors
-        browse them on the <strong className="text-zinc-200">Rules</strong> and <strong className="text-zinc-200">Community</strong>{" "}
-        pages.
+        Peaadministraatorid saavad hallata <strong className="text-zinc-200">kategooriaid</strong> (nt Üldine, Rollimäng,
+        Ebaseaduslik) ja <strong className="text-zinc-200">jaotisi</strong> (nummerdatud kirjed koos täistekstiga). Külastajad
+        saavad neid sirvida lehtedel <strong className="text-zinc-200">Reeglid</strong> ja <strong className="text-zinc-200">Kogukond</strong>.
       </p>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-zinc-100">Categories</h2>
+          <h2 className="text-lg font-semibold text-zinc-100">Kategooriad</h2>
           <form onSubmit={handleCreateCategory} className="space-y-2 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-            <label className="block text-xs font-medium text-zinc-400">New category title</label>
+            <label className="block text-xs font-medium text-zinc-400">Uue kategooria pealkiri</label>
             <input
               value={catTitle}
               onChange={(e) => setCatTitle(e.target.value)}
               className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
-              placeholder="e.g. General rules"
+              placeholder="nt Üldised reeglid"
             />
-            <label className="block text-xs font-medium text-zinc-400">Sort order</label>
+            <label className="block text-xs font-medium text-zinc-400">Järjestus</label>
             <input
               value={catSort}
               onChange={(e) => setCatSort(e.target.value)}
@@ -244,7 +243,7 @@ export function AdminRulesManager() {
               disabled={savingCat}
               className="rounded-lg brand-bg px-4 py-2 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-50"
             >
-              {savingCat ? "Saving…" : "Add category"}
+              {savingCat ? "Salvestamine…" : "Lisa kategooria"}
             </button>
           </form>
 
@@ -264,17 +263,19 @@ export function AdminRulesManager() {
                   >
                     {c.title}
                   </button>
-                  <span className="text-xs text-zinc-500">{c.sections.length} sections</span>
+                  <span className="text-xs text-zinc-500">
+                    {c.sections.length} {c.sections.length === 1 ? "jaotis" : "jaotist"}
+                  </span>
                   <button
                     type="button"
                     onClick={() => handleDeleteCategory(c.id)}
                     className="rounded border border-red-900/50 px-2 py-1 text-xs text-red-400 hover:bg-red-950/40"
                   >
-                    Delete
+                    Kustuta
                   </button>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                  <label className="text-zinc-500">Sort</label>
+                  <label className="text-zinc-500">Järjekord</label>
                   <input
                     defaultValue={c.sortOrder}
                     key={`${c.id}-sort`}
@@ -291,7 +292,7 @@ export function AdminRulesManager() {
                     }}
                     className="rounded border border-zinc-600 px-2 py-1 text-zinc-300 hover:bg-zinc-800"
                   >
-                    Apply sort
+                    Rakenda järjestus
                   </button>
                 </div>
               </li>
@@ -300,18 +301,18 @@ export function AdminRulesManager() {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-zinc-100">Sections in category</h2>
+          <h2 className="text-lg font-semibold text-zinc-100">Kategooria jaotised</h2>
           {!selectedCategory ? (
-            <p className="text-sm text-zinc-500">Select or create a category.</p>
+            <p className="text-sm text-zinc-500">Vali või loo kategooria.</p>
           ) : (
             <>
               <p className="text-xs text-zinc-500">
-                Editing: <strong className="text-zinc-300">{selectedCategory.title}</strong>
+                Muutmine: <strong className="text-zinc-300">{selectedCategory.title}</strong>
               </p>
               <form onSubmit={handleSaveSection} className="space-y-2 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                    {editingSectionId ? "Edit section" : "New section"}
+                    {editingSectionId ? "Muuda jaotist" : "Uus jaotis"}
                   </span>
                   {editingSectionId ? (
                     <button
@@ -319,33 +320,33 @@ export function AdminRulesManager() {
                       onClick={clearSectionForm}
                       className="text-xs text-zinc-400 hover:text-zinc-200"
                     >
-                      Cancel edit
+                      Tühista muutmine
                     </button>
                   ) : null}
                 </div>
-                <label className="block text-xs font-medium text-zinc-400">Code (optional)</label>
+                <label className="block text-xs font-medium text-zinc-400">Kood (valikuline)</label>
                 <input
                   value={secCode}
                   onChange={(e) => setSecCode(e.target.value)}
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 font-mono text-sm text-zinc-100"
                   placeholder="1.1"
                 />
-                <label className="block text-xs font-medium text-zinc-400">Title</label>
+                <label className="block text-xs font-medium text-zinc-400">Pealkiri</label>
                 <input
                   value={secTitle}
                   onChange={(e) => setSecTitle(e.target.value)}
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
-                  placeholder="Discord rules"
+                  placeholder="Discordi reeglid"
                 />
-                <label className="block text-xs font-medium text-zinc-400">Content</label>
+                <label className="block text-xs font-medium text-zinc-400">Sisu</label>
                 <textarea
                   value={secContent}
                   onChange={(e) => setSecContent(e.target.value)}
                   rows={10}
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
-                  placeholder="Full rule text (plain text; line breaks preserved)"
+                  placeholder="Reegli täistekst (lihttekst; reavahetused säilitatakse)"
                 />
-                <label className="block text-xs font-medium text-zinc-400">Sort order</label>
+                <label className="block text-xs font-medium text-zinc-400">Järjestus</label>
                 <input
                   value={secSort}
                   onChange={(e) => setSecSort(e.target.value)}
@@ -357,7 +358,7 @@ export function AdminRulesManager() {
                   disabled={savingSec}
                   className="rounded-lg brand-bg px-4 py-2 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-50"
                 >
-                  {savingSec ? "Saving…" : editingSectionId ? "Update section" : "Add section"}
+                  {savingSec ? "Salvestamine…" : editingSectionId ? "Uuenda jaotist" : "Lisa jaotis"}
                 </button>
               </form>
 
@@ -377,14 +378,14 @@ export function AdminRulesManager() {
                         onClick={() => startEditSection(s)}
                         className="rounded border border-zinc-600 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800"
                       >
-                        Edit
+                        Muuda
                       </button>
                       <button
                         type="button"
                         onClick={() => void handleDeleteSection(s.id)}
                         className="rounded border border-red-900/50 px-2 py-1 text-xs text-red-400 hover:bg-red-950/40"
                       >
-                        Delete
+                        Kustuta
                       </button>
                     </div>
                   </li>
