@@ -32,6 +32,7 @@ model User {
   auditLogs              AuditLog[]          @relation("AuditActor")
   tickets                 Ticket[]
   ticketMessages          TicketMessage[]
+  claimedTickets          Ticket[]        @relation("TicketClaimer")
 }
 
 model SiteMember {
@@ -299,6 +300,8 @@ model Ticket {
   logs        TicketLog[]
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+  claimedById String?
+  claimedBy   User?           @relation("TicketClaimer", fields: [claimedById], references: [id], onDelete: SetNull)
 }
 
 model TicketMessage {
