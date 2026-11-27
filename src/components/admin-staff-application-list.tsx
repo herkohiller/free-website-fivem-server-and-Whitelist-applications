@@ -17,6 +17,20 @@ type StaffApplication = {
   reviewedByUser?: { username: string; avatar: string | null } | null;
 };
 
+const FILTER_LABELS: Record<"pending" | "approved" | "rejected" | "all", string> = {
+  pending: "Ootel",
+  approved: "Kinnitatud",
+  rejected: "Tagasi lükatud",
+  all: "Kõik",
+};
+
+function getStatusLabel(status: string) {
+  if (status === "approved") return "kinnitatud";
+  if (status === "rejected") return "tagasi lükatud";
+  if (status === "pending") return "ootel";
+  return status;
+}
+
 export function AdminStaffApplicationList() {
   const [applications, setApplications] = useState<StaffApplication[]>([]);
   const [questions, setQuestions] = useState<FormQuestionDefinition[]>([]);
@@ -79,7 +93,7 @@ export function AdminStaffApplicationList() {
     : filtered;
 
   if (loading) {
-    return <p className="text-zinc-500">Loading staff applications...</p>;
+    return <p className="text-zinc-500">Meeskonna avalduste laadimine...</p>;
   }
 
   return (
@@ -93,7 +107,7 @@ export function AdminStaffApplicationList() {
             setRejectModalId(null);
           }
         }}
-        title="Reject staff application"
+        title="Lükka meeskonna avaldus tagasi"
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
@@ -108,7 +122,7 @@ export function AdminStaffApplicationList() {
                   : "border border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
               }`}
             >
-              {f}
+              {FILTER_LABELS[f]}
             </button>
           ))}
         </div>
@@ -117,16 +131,16 @@ export function AdminStaffApplicationList() {
             type="text"
             value={discordSearch}
             onChange={(e) => setDiscordSearch(e.target.value)}
-            placeholder="Search by Discord ID"
+            placeholder="Otsi Discordi ID järgi"
             className="w-full rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
           />
         </div>
       </div>
       {filteredByDiscord.length === 0 ? (
         <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-8 text-center text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-500">
-          <p>No staff applications in this category.</p>
+          <p>Selles kategoorias pole meeskonna avaldusi.</p>
           <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-600">
-            Applications submitted via the Staff application form (/apply/staff) appear here. Try switching the status filter to &quot;all&quot;.
+            Meeskonna avalduse vormi (/apply/staff) kaudu esitatud avaldused ilmuvad siia. Proovi muuta olekufiltriks &quot;Kõik&quot;.
           </p>
         </div>
       ) : (
@@ -147,7 +161,7 @@ export function AdminStaffApplicationList() {
                     {app.user?.avatar ? (
                       <img src={app.user.avatar} alt="" className="h-5 w-5 rounded-full object-cover" width={20} height={20} />
                     ) : null}
-                    {app.user?.username ?? "Unknown"}
+                    {app.user?.username ?? "Teadmata"}
                     {app.user?.discordId && (
                       <span className="ml-2 rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-300">
                         {app.user.discordId}
@@ -164,7 +178,7 @@ export function AdminStaffApplicationList() {
                             : "bg-amber-500/20 text-amber-400"
                       }`}
                     >
-                      {app.status}
+                      {getStatusLabel(app.status)}
                     </span>
                     <span className="text-zinc-500">{expandedId === app.id ? "▼" : "▶"}</span>
                   </div>
@@ -172,11 +186,11 @@ export function AdminStaffApplicationList() {
                 {expandedId === app.id && (
                   <div className="border-t border-zinc-800 p-4 space-y-4">
                     <div className="text-sm text-zinc-500">
-                      Applied {new Date(app.createdAt).toLocaleString()}
+                      Esitatud {new Date(app.createdAt).toLocaleString("et-EE")}
                     </div>
                     <div className="text-sm">
-                      <span className="text-zinc-500">IP address</span>
-                      <p className="mt-0.5 font-mono text-zinc-200">{app.submitterIp ?? "Unknown"}</p>
+                      <span className="text-zinc-500">IP-aadress</span>
+                      <p className="mt-0.5 font-mono text-zinc-200">{app.submitterIp ?? "Teadmata"}</p>
                     </div>
                     {questions.map((q) => (
                       <div key={q.id}>
@@ -189,7 +203,7 @@ export function AdminStaffApplicationList() {
                     {(app.reviewedByUser || app.reviewedAt) && app.status !== "pending" && (
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-zinc-800 pt-4 text-sm">
                         <span className="text-zinc-500">
-                          {app.status === "approved" ? "Accepted" : "Rejected"} by{" "}
+                          {app.status === "approved" ? "Kinnitas" : "Lükkas tagasi"}{" "}
                           {app.reviewedByUser ? (
                             <span className="inline-flex items-center gap-1.5 text-zinc-300">
                               {app.reviewedByUser.avatar ? (
@@ -203,7 +217,7 @@ export function AdminStaffApplicationList() {
                         </span>
                         {app.reviewedAt && (
                           <span className="text-zinc-500">
-                            {new Date(app.reviewedAt).toLocaleString()}
+                            {new Date(app.reviewedAt).toLocaleString("et-EE")}
                           </span>
                         )}
                       </div>
@@ -215,14 +229,14 @@ export function AdminStaffApplicationList() {
                           onClick={() => updateStatus(app.id, "approved")}
                           className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
                         >
-                          Approve
+                          Kinnita
                         </button>
                         <button
                           type="button"
                           onClick={() => setRejectModalId(app.id)}
                           className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
                         >
-                          Reject
+                          Lükka tagasi
                         </button>
                       </div>
                     )}
