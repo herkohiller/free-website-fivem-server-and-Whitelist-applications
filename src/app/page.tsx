@@ -5,15 +5,27 @@ import { getBrandingSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
+type FivemPlayer = {
+  name: string;
+  id: number;
+  ping: number;
+};
+
 type FivemServerInfo = {
   online: boolean;
   players: number;
   maxPlayers: number;
   connectCode: string;
-  topPlayers: { name: string; id: number; ping: number }[];
+  topPlayers: Array<FivemPlayer>;
 };
 
-async function getFivemServerInfo(serverCode: string | null | undefined): Promise<FivemServerInfo> {
+type UserApplication = NonNullable<
+  Awaited<ReturnType<typeof prisma.application.findFirst>>
+>;
+
+async function getFivemServerInfo(
+  serverCode: string | null | undefined
+): Promise<FivemServerInfo> {
   const code = (serverCode || "").trim().replace(/^cfx\.re\/join\//i, "");
   if (!code) {
     return {
@@ -21,12 +33,15 @@ async function getFivemServerInfo(serverCode: string | null | undefined): Promis
       players: 0,
       maxPlayers: 64,
       connectCode: "",
-      topPlayers: [],
+      topPlayers: new Array<FivemPlayer>(),
     };
   }
 
   try {
-    const res = await fetch(`https://fivem.net{encodeURIComponent(code)}`, {
+    const apiUrl =
+      "https://fivem.net" +
+      encodeURIComponent(code);
+    const res = await fetch(apiUrl, {
       headers: { "User-Agent": "Mozilla/5.0" },
       next: { revalidate: 30 },
     });
@@ -37,7 +52,7 @@ async function getFivemServerInfo(serverCode: string | null | undefined): Promis
         players: 0,
         maxPlayers: 64,
         connectCode: code,
-        topPlayers: [],
+        topPlayers: new Array<FivemPlayer>(),
       };
     }
 
@@ -45,17 +60,21 @@ async function getFivemServerInfo(serverCode: string | null | undefined): Promis
       Data?: {
         clients?: number;
         sv_maxclients?: number;
-        players?: { name?: string; id?: number; ping?: number }[];
+        players?: Array<{ name?: string; id?: number; ping?: number }>;
       };
     };
 
     const data = json.Data;
-    const rawPlayers = Array.isArray(data?.players) ? data.players : [];
+    const rawPlayers = Array.isArray(data?.players)
+      ? data.players
+      : new Array<{ name?: string; id?: number; ping?: number }>();
 
     return {
       online: true,
-      players: typeof data?.clients === "number" ? data.clients : rawPlayers.length,
-      maxPlayers: typeof data?.sv_maxclients === "number" ? data.sv_maxclients : 64,
+      players:
+        typeof data?.clients === "number" ? data.clients : rawPlayers.length,
+      maxPlayers:
+        typeof data?.sv_maxclients === "number" ? data.sv_maxclients : 64,
       connectCode: code,
       topPlayers: rawPlayers.slice(0, 10).map((p, i) => ({
         name: p.name || `Mängija #${i + 1}`,
@@ -69,7 +88,7 @@ async function getFivemServerInfo(serverCode: string | null | undefined): Promis
       players: 0,
       maxPlayers: 64,
       connectCode: code,
-      topPlayers: [],
+      topPlayers: new Array<FivemPlayer>(),
     };
   }
 }
@@ -107,7 +126,6 @@ export default async function HomePage() {
   const session = await auth();
   const branding = await getBrandingSettings();
 
-  // 1. KUI KASUTAJA POLE SISSE LOGITUD: Avalik avaleht
   if (!session?.user) {
     return (
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden bg-zinc-950 px-4 text-center text-white">
@@ -133,40 +151,42 @@ export default async function HomePage() {
     );
   }
 
-  // 2. KUI KASUTAJA ON SISSE LOGITUD: UCP Avaleht
   const resolved = await resolveSessionUserId(session);
   const userId = resolved.ok ? resolved.userId : null;
 
-  const [userApplications, recentMembers, serverInfo] = await Promise.all([
-    userId
-      ? prisma.application.findMany({
-          where: { userId },
-          orderBy: { createdAt: "desc" },
-        })
-      : Promise.resolve(),
-    prisma.user.findMany({
-      orderBy: { lastActiveAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        username: true,
-        avatar: true,
-        applications: {
-          where: { status: "approved" },
-          take: 1,
-          select: { inGameName: true },
-        },
-      },
-    }),
-    getFivemServerInfo(branding.fivemServerDetailId),
-  ]);
+  let userApplications: Array<UserApplication> = new Array();
+  if (userId) {
+    userApplications = await prisma.application.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+  }
 
-  const approvedChar = userApplications.find((a) => a.status === "approved") ?? userApplications ?? null;
+  const recentMembers = await prisma.user.findMany({
+    orderBy: { lastActiveAt: "desc" },
+    take: 10,
+    select: {
+      id: true,
+      username: true,
+      avatar: true,
+      applications: {
+        where: { status: "approved" },
+        take: 1,
+        select: { inGameName: true },
+      },
+    },
+  });
+
+  const serverInfo = await getFivemServerInfo(branding.fivemServerDetailId);
+
+  const approvedChar =
+    userApplications.find((a) => a.status === "approved") ??
+    userApplications.at(0) ??
+    null;
   const citizenId = approvedChar
     ? `SSA${approvedChar.id.slice(-5).toUpperCase()}`
     : "Puudub";
 
-  // TOP 10 nimekiri: kui serveris on hetkel mängijad sees, näita neid; muidu näita 10 aktiivseimat kodanikku
   const leaderboard =
     serverInfo.topPlayers.length > 0
       ? serverInfo.topPlayers.map((p, idx) => ({
@@ -178,7 +198,7 @@ export default async function HomePage() {
         }))
       : recentMembers.map((m, idx) => ({
           rank: idx + 1,
-          primaryName: m.applications?.inGameName || m.username,
+          primaryName: m.applications.at(0)?.inGameName || m.username,
           secondaryName: m.username,
           rightValue: `#${idx + 1}`,
           rightLabel: "KOHT",
@@ -187,7 +207,6 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen w-full bg-[#090b10] px-4 py-6 text-zinc-100 sm:px-8 sm:py-8">
       <div className="mx-auto max-w-[1400px] space-y-6">
-        {/* ÜLEMINE PÄIS */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800/80 pb-6">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-400">
@@ -201,7 +220,6 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Kasutaja profiil paremal üleval */}
           <div className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/70 px-3.5 py-2">
             {session.user.image ? (
               <img
@@ -223,11 +241,8 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* PÕHISISU: VASAK VEERG (KARAKTERID) + PAREM VEERG (SERVER & TOP 10) */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
-          {/* VASAK VEERG */}
           <div className="space-y-6">
-            {/* 1. SINU KARAKTERID */}
             <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500">
                 KARAKTERID
@@ -236,12 +251,10 @@ export default async function HomePage() {
 
               {approvedChar ? (
                 <>
-                  {/* Valitud karakteri riba */}
                   <div className="mt-4 rounded-xl border border-indigo-500/40 bg-indigo-950/20 px-4 py-2.5 text-center text-sm font-semibold text-indigo-200">
                     {approvedChar.inGameName}
                   </div>
 
-                  {/* Karakteri pilt ja detailid */}
                   <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-[200px_1fr]">
                     <div className="flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/90">
                       {session.user.image ? (
@@ -312,7 +325,6 @@ export default async function HomePage() {
               )}
             </section>
 
-            {/* 2. KARAKTERI FRAKTSIOONID */}
             <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-white">Karakteri fraktsioonid</h3>
@@ -329,7 +341,6 @@ export default async function HomePage() {
               </p>
             </section>
 
-            {/* 3. KARAKTERILE KUULUVAD SÕIDUKID */}
             <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-white">Karakterile kuuluvad sõidukid</h3>
@@ -347,7 +358,6 @@ export default async function HomePage() {
               </p>
             </section>
 
-            {/* 4. KARAKTERILE KUULUVAD KINNISVARAD */}
             <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-white">Karakterile kuuluvad kinnisvarad</h3>
@@ -363,7 +373,6 @@ export default async function HomePage() {
               </p>
             </section>
 
-            {/* 5. SAADETUD KARAKTERI TAOTLUSED */}
             <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
@@ -434,9 +443,7 @@ export default async function HomePage() {
             </section>
           </div>
 
-          {/* PAREM VEERG: SERVER JA TOP 10 */}
           <div className="space-y-6">
-            {/* SERVERI STAATUS JA SLOTID */}
             <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -487,7 +494,6 @@ export default async function HomePage() {
               )}
             </section>
 
-            {/* TOP 10 EDETABEL */}
             <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500">
                 EDETABEL
