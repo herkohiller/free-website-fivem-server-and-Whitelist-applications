@@ -37,7 +37,8 @@ export function Header() {
     { href: "/applications", label: "Minu avaldused" },
     { href: "/apply", label: branding.whitelistNavLabel || "Whitelist" },
     { href: "/apply/staff", label: "Meeskond" },
-    ...(isAdmin ? [{ href: "/admin", label: "Admin" }] :),
+   ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : new Array()),
+
   ];
 
   const logoBlock = (
