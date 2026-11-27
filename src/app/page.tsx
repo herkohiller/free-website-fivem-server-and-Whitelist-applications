@@ -32,7 +32,6 @@ function discordAvatarUrl(userId: string, avatarHash: string | null): string | n
 async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
   const cleanId = discordId.trim();
 
-  // 1. Proovime võtta otse Discordi API-st (kõrgeima kvaliteediga pilt ja värskeim nimi)
   const botToken = process.env.DISCORD_BOT_TOKEN?.trim();
   if (botToken && cleanId) {
     try {
@@ -57,7 +56,6 @@ async function resolveDiscordLeader(discordId: string): Promise<LeaderProfile> {
     }
   }
 
-  // 2. Varuvõimalus: otsime veebilehe andmebaasist ja teeme pildi teravaks (?size=1024)
   try {
     const user = await prisma.user.findUnique({
       where: { discordId: cleanId },
