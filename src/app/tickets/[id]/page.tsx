@@ -2,21 +2,43 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [ticket, setTicket] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
 
   const loadTicket = async () => {
     const res = await fetch(`/api/tickets/${id}`);
-    if (res.ok) setTicket(await res.json());
+    if (res.ok) {
+      const data = await res.json();
+      setTicket(data.ticket);
+      setIsAdmin(Boolean(data.isAdmin));
+    }
   };
 
   useEffect(() => {
     loadTicket();
-  }, [id]);
+  }, new Array(id));
+
+  const sendAction = async (action: string) => {
+    await fetch(`/api/tickets/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    loadTicket();
+  };
+
+  const deleteTicket = async () => {
+    if (!confirm("Kas oled kindel, et soovid selle ticketi jäädavalt kustutada?")) return;
+    const res = await fetch(`/api/tickets/${id}`, { method: "DELETE" });
+    if (res.ok) router.push("/tickets");
+  };
 
   const sendReply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,31 +56,54 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
     setSending(false);
   };
 
-  const closeTicket = async () => {
-    await fetch(`/api/tickets/${id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "CLOSE" }),
-    });
-    loadTicket();
-  };
-
   if (!ticket) return <div className="p-6 text-zinc-400">Laen ticketit...</div>;
 
   return (
     <div className="p-6 max-w-7xl mx-auto text-white">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Link href="/tickets" className="text-sm text-zinc-400 hover:text-white">
           ← Tagasi ticketite juurde
         </Link>
-        {ticket.status !== "SULETUD" && (
-          <button
-            onClick={closeTicket}
-            className="px-4 py-1.5 text-xs bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/20"
-          >
-            Sulge ticket
-          </button>
-        )}
+
+        <div className="flex flex-wrap items-center gap-2">
+          {isAdmin && ticket.status !== "SULETUD" && (
+            <>
+              {!ticket.claimedBy ? (
+                <button
+                  onClick={() => sendAction("CLAIM")}
+                  className="px-4 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25"
+                >
+                  ✋ Claimi ticket
+                </button>
+              ) : (
+                <button
+                  onClick={() => sendAction("UNCLAIM")}
+                  className="px-4 py-1.5 text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg hover:bg-zinc-700"
+                >
+                  Vabasta claim
+                </button>
+              )}
+            </>
+          )}
+
+          {ticket.status !== "SULETUD" && (
+            <button
+              onClick={() => sendAction("CLOSE")}
+              className="px-4 py-1.5 text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-lg hover:bg-amber-500/20"
+            >
+              Sulge ticket
+            </button>
+          )}
+
+          {isAdmin && (
+            <button
+              onClick={deleteTicket}
+              className="px-4 py-1.5 text-xs font-medium bg-red-500/15 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/25"
+            >
+              Kustuta ticket
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -158,8 +203,8 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
         {/* PAREM VEERG: Osalejad ja Ajajoon */}
         <div className="space-y-6">
-          <div className="bg-[#111216] border border-zinc-800/80 rounded-2xl p-6">
-            <h2 className="text-lg font-bold mb-4">Osalejad</h2>
+          <div className="bg-[#111216] border border-zinc-800/80 rounded-2xl p-6 space-y-4">
+            <h2 className="text-lg font-bold">Osalejad</h2>
             <div className="flex items-center gap-3">
               <img
                 src={ticket.user?.avatar || "/vercel.svg"}
@@ -171,6 +216,22 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                 <span className="ml-2 text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">Looja</span>
               </div>
             </div>
+
+            {ticket.claimedBy && (
+              <div className="flex items-center gap-3 pt-3 border-t border-zinc-800/80">
+                <img
+                  src={ticket.claimedBy?.avatar || "/vercel.svg"}
+                  alt=""
+                  className="w-9 h-9 rounded-full bg-zinc-800"
+                />
+                <div>
+                  <span className="font-medium text-sm">{ticket.claimedBy?.username}</span>
+                  <span className="ml-2 text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                    Vastutaja
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-[#111216] border border-zinc-800/80 rounded-2xl p-6">
