@@ -45,13 +45,14 @@ export function Header() {
       onClick={() => setMobileOpen(false)}
       className="flex items-center gap-3 px-2 py-2 font-bold text-zinc-100"
     >
-      <img
-        src="/logo.png"
+          <img
+        src="/taust2.png"
         alt={`${branding.siteName} logo`}
         className="h-11 w-11 shrink-0 rounded-xl object-cover shadow-md"
         width={44}
         height={44}
       />
+
       <span className="truncate text-base tracking-tight">{branding.siteName}</span>
     </Link>
   );
