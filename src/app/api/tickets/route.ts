@@ -13,13 +13,18 @@ export async function GET() {
     select: { isAdmin: true },
   });
 
+  const isAdmin = Boolean(dbUser?.isAdmin);
+
   const tickets = await prisma.ticket.findMany({
-    where: dbUser?.isAdmin ? {} : { userId: session.user.id },
-    include: { user: { select: { username: true, avatar: true } } },
+    where: isAdmin ? {} : { userId: session.user.id },
+    include: {
+      user: { select: { id: true, username: true, avatar: true } },
+      claimedBy: { select: { id: true, username: true, avatar: true } },
+    },
     orderBy: { updatedAt: "desc" },
   });
 
-  return NextResponse.json(tickets);
+  return NextResponse.json({ tickets, isAdmin, currentUserId: session.user.id });
 }
 
 export async function POST(req: Request) {
