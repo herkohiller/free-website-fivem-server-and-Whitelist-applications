@@ -16,14 +16,14 @@ type FivemServerInfo = {
   players: number;
   maxPlayers: number;
   connectCode: string;
-  topPlayers: FivemPlayer[];
+  topPlayers: Array<FivemPlayer>;
 };
 
 async function getFivemServerInfo(
   serverCode: string | null | undefined
 ): Promise<FivemServerInfo> {
   const code = (serverCode || "").trim().replace(/^cfx\.re\/join\//i, "");
-  const emptyPlayers: FivemPlayer[] = [];
+  const emptyPlayers: Array<FivemPlayer> = new Array();
 
   if (!code) {
     return {
@@ -58,12 +58,14 @@ async function getFivemServerInfo(
       Data?: {
         clients?: number;
         sv_maxclients?: number;
-        players?: { name?: string; id?: number; ping?: number }[];
+        players?: Array<{ name?: string; id?: number; ping?: number }>;
       };
     };
 
     const data = json.Data;
-    const rawPlayers = Array.isArray(data?.players) ? data.players : [];
+    const rawPlayers = Array.isArray(data?.players)
+      ? data.players
+      : new Array<{ name?: string; id?: number; ping?: number }>();
 
     return {
       online: true,
@@ -89,31 +91,35 @@ async function getFivemServerInfo(
   }
 }
 
-function getStatusBadge(status: string) {
+function getStatusPill(status: string) {
   if (status === "approved") {
     return (
-      <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-0.5 text-xs font-semibold text-emerald-400">
-        Aktsepteeritud
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
+        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+        Kinnitatud
       </span>
     );
   }
   if (status === "rejected") {
     return (
-      <span className="inline-flex items-center rounded-full border border-red-500/30 bg-red-500/15 px-3 py-0.5 text-xs font-semibold text-red-400">
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-rose-500/15 px-2.5 py-1 text-xs font-semibold text-rose-400 ring-1 ring-inset ring-rose-500/30">
+        <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
         Tagasi lükatud
       </span>
     );
   }
   if (status === "device_check") {
     return (
-      <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/15 px-3 py-0.5 text-xs font-semibold text-amber-300">
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-300 ring-1 ring-inset ring-amber-500/30">
+        <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
         Seadmekontroll
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/15 px-3 py-0.5 text-xs font-semibold text-amber-400">
-      Ülevaatamisel
+    <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-400 ring-1 ring-inset ring-amber-500/30">
+      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+      Ootel
     </span>
   );
 }
@@ -122,6 +128,7 @@ export default async function HomePage() {
   const session = await auth();
   const branding = await getBrandingSettings();
 
+  // Sisselogimata külastaja vaade
   if (!session?.user) {
     return (
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden bg-zinc-950 px-4 text-center text-white">
@@ -134,19 +141,20 @@ export default async function HomePage() {
         <div className="relative z-10 mx-auto max-w-4xl">
           <h1 className="text-4xl font-black uppercase tracking-tight sm:text-6xl md:text-7xl">
             <span className="text-white">STREETS OF </span>
-            <span className="text-orange-500">SAN ANDREAS</span>
+            <span className="text-rose-500">SAN ANDREAS</span>
           </h1>
 
           <div className="mx-auto mt-6 flex max-w-2xl items-center justify-center gap-3 text-sm italic text-zinc-300 sm:text-base">
-            <span className="h-5 w-0.5 shrink-0 bg-orange-500" />
+            <span className="h-5 w-0.5 shrink-0 bg-rose-500" />
             <p>&ldquo;Sinu lugu, sinu valikud, sinu linn — liitu meiega juba täna!&rdquo;</p>
-            <span className="h-5 w-0.5 shrink-0 bg-orange-500" />
+            <span className="h-5 w-0.5 shrink-0 bg-rose-500" />
           </div>
         </div>
       </div>
     );
   }
 
+  // Sisselogitud mängija juhtpaneel
   const resolved = await resolveSessionUserId(session);
   const userId = resolved.ok ? resolved.userId : null;
 
@@ -159,371 +167,374 @@ export default async function HomePage() {
         where: { id: "__none__" },
       });
 
-  const recentMembers = await prisma.user.findMany({
-    orderBy: { lastActiveAt: "desc" },
-    take: 10,
-    select: {
-      id: true,
-      username: true,
-      avatar: true,
-      applications: {
-        where: { status: "approved" },
-        take: 1,
-        select: { inGameName: true },
+  const userStaffApplications = userId
+    ? await prisma.staffApplication.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+      })
+    : await prisma.staffApplication.findMany({
+        where: { id: "__none__" },
+      });
+
+  const [recentMembers, totalMembersCount] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { lastActiveAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        applications: {
+          where: { status: "approved" },
+          take: 1,
+          select: { inGameName: true },
+        },
       },
-    },
-  });
+    }),
+    prisma.user.count(),
+  ]);
 
   const serverInfo = await getFivemServerInfo(branding.fivemServerDetailId);
 
   const approvedChar =
     userApplications.find((a) => a.status === "approved") ??
-    userApplications[0] ??
+    userApplications.at(0) ??
     null;
-  const citizenId = approvedChar
-    ? `SSA${approvedChar.id.slice(-5).toUpperCase()}`
-    : "Puudub";
+
+  const citizenCode = approvedChar
+    ? `SSA-${approvedChar.id.slice(-4).toUpperCase()}`
+    : "—";
 
   const leaderboard =
     serverInfo.topPlayers.length > 0
       ? serverInfo.topPlayers.map((p, idx) => ({
           rank: idx + 1,
-          primaryName: p.name,
-          secondaryName: `ID #${p.id}`,
-          rightValue: `${p.ping} ms`,
-          rightLabel: "PING",
+          name: p.name,
+          sub: `Mängija #${p.id}`,
+          badge: `${p.ping} ms`,
+          avatar: null as string | null,
         }))
       : recentMembers.map((m, idx) => ({
           rank: idx + 1,
-          primaryName: m.applications[0]?.inGameName || m.username,
-          secondaryName: m.username,
-          rightValue: `#${idx + 1}`,
-          rightLabel: "KOHT",
+          name: m.applications.at(0)?.inGameName || m.username,
+          sub: `@${m.username}`,
+          badge: `#${idx + 1}`,
+          avatar: m.avatar,
         }));
 
   return (
-    <div className="min-h-screen w-full bg-[#090b10] px-4 py-6 text-zinc-100 sm:px-8 sm:py-8">
-      <div className="mx-auto max-w-[1400px] space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800/80 pb-6">
+    <div className="min-h-screen w-full bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-8 sm:py-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        {/* ÜLEMINE TERVITUSRIBA + KIIRNUPUD */}
+        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-zinc-800/80 bg-gradient-to-r from-zinc-900/90 via-zinc-900/70 to-rose-950/20 p-6 sm:flex-row sm:items-center">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-400">
-              — UCP
-            </p>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-              Avaleht
+            <span className="inline-block rounded-full bg-rose-500/15 px-3 py-0.5 text-xs font-semibold text-rose-400">
+              Streets of San Andreas RP
+            </span>
+            <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              Tere tulemast, {session.user.name}!
             </h1>
             <p className="mt-1 text-sm text-zinc-400">
-              Sinu karakterid, serveri olek ja olulisem info ühes kohas.
+              Halda oma kodaniku profiili, esita avaldusi ja jälgi serveri seisu.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/70 px-3.5 py-2">
-            {session.user.image ? (
-              <img
-                src={session.user.image}
-                alt=""
-                className="h-9 w-9 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600/30 text-sm font-bold text-indigo-300">
-                {(session.user.name || "K").slice(0, 1).toUpperCase()}
-              </div>
-            )}
-            <div className="text-left">
-              <p className="text-sm font-semibold text-white">{session.user.name}</p>
-              <span className="inline-block rounded bg-indigo-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-300">
-                Kodanik
-              </span>
-            </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/apply"
+              className="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-rose-600/20 transition hover:bg-rose-500"
+            >
+              Taotle Whitelisti
+            </Link>
+            <Link
+              href="/apply/staff"
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm font-bold text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800"
+            >
+              Kandideeri meeskonda
+            </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
+        {/* 4 ÜLEVAATE KAARTI */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/50 p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-zinc-400">Serveri staatus</p>
+              <span
+                className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
+                  serverInfo.online ? "text-emerald-400" : "text-rose-400"
+                }`}
+              >
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    serverInfo.online ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+                  }`}
+                />
+                {serverInfo.online ? "Sees" : "Väljas"}
+              </span>
+            </div>
+            <p className="mt-2 text-2xl font-extrabold text-white">
+              {serverInfo.players} / {serverInfo.maxPlayers}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">Mängijat hetkel linnas</p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/50 p-5">
+            <p className="text-xs font-medium text-zinc-400">Aktiivne karakter</p>
+            <p className="mt-2 truncate text-2xl font-extrabold text-white">
+              {approvedChar ? approvedChar.inGameName : "Puudub"}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">
+              {approvedChar ? `Kood: ${citizenCode}` : "Esita whitelist-avaldus"}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/50 p-5">
+            <p className="text-xs font-medium text-zinc-400">Sinu avaldused</p>
+            <p className="mt-2 text-2xl font-extrabold text-white">
+              {userApplications.length + userStaffApplications.length}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">
+              {userApplications.length} whitelist · {userStaffApplications.length} meeskond
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/50 p-5">
+            <p className="text-xs font-medium text-zinc-400">Kogukonna liikmeid</p>
+            <p className="mt-2 text-2xl font-extrabold text-white">{totalMembersCount}</p>
+            <p className="mt-1 text-xs text-zinc-500">Registreeritud kodanikku</p>
+          </div>
+        </div>
+
+        {/* PÕHISISU: VASAKUL KODANIKU PROFIIL & AVALDUSED, PAREMAL ÜHENDUS & TOP 10 */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
           <div className="space-y-6">
-            <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500">
-                KARAKTERID
-              </p>
-              <h2 className="mt-1 text-xl font-bold text-white">Sinu karakterid</h2>
+            {/* KODANIKU KAART */}
+            <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800/80 pb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-white">Kodaniku profiil</h2>
+                  <p className="text-xs text-zinc-400">
+                    Sinu tegelase andmed ja staatus serveris
+                  </p>
+                </div>
+                {approvedChar && getStatusPill(approvedChar.status)}
+              </div>
 
               {approvedChar ? (
-                <>
-                  <div className="mt-4 rounded-xl border border-indigo-500/40 bg-indigo-950/20 px-4 py-2.5 text-center text-sm font-semibold text-indigo-200">
-                    {approvedChar.inGameName}
+                <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-center">
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-zinc-700/80 bg-zinc-800">
+                    {session.user.image ? (
+                      <img
+                        src={session.user.image}
+                        alt={approvedChar.inGameName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-zinc-400">
+                        {approvedChar.inGameName.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
                   </div>
 
-                  <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-[200px_1fr]">
-                    <div className="flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/90">
-                      {session.user.image ? (
-                        <img
-                          src={session.user.image}
-                          alt={approvedChar.inGameName}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-5xl font-extrabold text-zinc-600">
-                          {approvedChar.inGameName.slice(0, 1).toUpperCase()}
-                        </span>
-                      )}
+                  <div className="grid flex-1 grid-cols-2 gap-4 sm:grid-cols-3">
+                    <div>
+                      <p className="text-xs text-zinc-500">Tegelase nimi</p>
+                      <p className="mt-0.5 text-sm font-bold text-white">
+                        {approvedChar.inGameName}
+                      </p>
                     </div>
-
-                    <div className="divide-y divide-zinc-800/80 text-sm">
-                      <div className="grid grid-cols-2 py-3">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                          [OLEK]:
-                        </span>
-                        <div>{getStatusBadge(approvedChar.status)}</div>
-                      </div>
-                      <div className="grid grid-cols-2 py-3">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                          [ISIKUKOOD]:
-                        </span>
-                        <span className="font-mono font-semibold text-zinc-200">
-                          {citizenId}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 py-3">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                          [TÄISNIMI]:
-                        </span>
-                        <span className="font-semibold text-white">
-                          {approvedChar.inGameName}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 py-3">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                          [VANUS]:
-                        </span>
-                        <span className="text-zinc-200">{approvedChar.age}-aastane</span>
-                      </div>
-                      <div className="grid grid-cols-2 py-3">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                          [LOODUD]:
-                        </span>
-                        <span className="text-zinc-300">
-                          {new Date(approvedChar.createdAt).toLocaleDateString("et-EE")}
-                        </span>
-                      </div>
+                    <div>
+                      <p className="text-xs text-zinc-500">Kodaniku kood</p>
+                      <p className="mt-0.5 font-mono text-sm font-semibold text-zinc-200">
+                        {citizenCode}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-zinc-500">Vanus</p>
+                      <p className="mt-0.5 text-sm font-semibold text-zinc-200">
+                        {approvedChar.age} a
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-zinc-500">Töökoht / Fraktsioon</p>
+                      <p className="mt-0.5 text-sm text-zinc-300">Töötu</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-zinc-500">Sõidukid</p>
+                      <p className="mt-0.5 text-sm text-zinc-300">0 sõidukit</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-zinc-500">Kinnisvara</p>
+                      <p className="mt-0.5 text-sm text-zinc-300">Puudub</p>
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
-                <div className="mt-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 text-center">
-                  <p className="text-sm text-zinc-400">
-                    Sul ei ole veel ühtegi karakterit loodud.
+                <div className="mt-5 flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 py-8 text-center">
+                  <p className="text-sm font-medium text-zinc-300">
+                    Sul pole veel tegelast loodud
+                  </p>
+                  <p className="mt-1 max-w-md text-xs text-zinc-500">
+                    Täida whitelist-avaldus, et alustada oma teekonda Streets of San Andreas RP serveris.
                   </p>
                   <Link
                     href="/apply"
-                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                    className="mt-4 rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-rose-500"
                   >
-                    + Loo uus karakter
+                    Alusta avaldust
                   </Link>
                 </div>
               )}
             </section>
 
-            <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">Karakteri fraktsioonid</h3>
-                <span className="text-xs text-zinc-500">(2 vaba kohta)</span>
-              </div>
-              <div className="mt-4 grid grid-cols-4 border-b border-zinc-800/80 pb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                <span>NIMI</span>
-                <span>AKTIIVSUS</span>
-                <span>TÖÖAEG KOKKU</span>
-                <span>AUASTE</span>
-              </div>
-              <p className="py-6 text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                FRAKTSIOONID PUUDUVAD
-              </p>
-            </section>
-
-            <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">Karakterile kuuluvad sõidukid</h3>
-                <span className="text-xs text-zinc-500">(5 vaba kohta)</span>
-              </div>
-              <div className="mt-4 grid grid-cols-5 border-b border-zinc-800/80 pb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                <span>NIMETUS</span>
-                <span>NUMBRIMÄRK</span>
-                <span>LIIKLUSKINDLUSTUS</span>
-                <span>OLEK</span>
-                <span>JAGATUD</span>
-              </div>
-              <p className="py-6 text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                SÕIDUKID PUUDUVAD
-              </p>
-            </section>
-
-            <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">Karakterile kuuluvad kinnisvarad</h3>
-                <span className="text-xs text-zinc-500">(0 tk)</span>
-              </div>
-              <div className="mt-4 grid grid-cols-3 border-b border-zinc-800/80 pb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                <span>KINNISVARA</span>
-                <span>AADRESS</span>
-                <span>JAGATUD KARAKTERITEGA</span>
-              </div>
-              <p className="py-6 text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                KINNISVARAD PUUDUVAD
-              </p>
-            </section>
-
-            <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+            {/* SINU VIIMASED AVALDUSED (WHITELIST + MEESKOND) */}
+            <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6">
+              <div className="flex items-center justify-between border-b border-zinc-800/80 pb-4">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-white">
-                      Saadetud karakteri taotlused
-                    </h3>
-                    <span className="text-xs text-zinc-500">
-                      ({userApplications.length} esitatud)
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-zinc-400">
-                    Sinu karakteri taotlused on alljärgnevad. Pea meeles, et sa ei saa luua uut karakterit enne kui sinu eelnevad taotlused on aktsepteeritud.
+                  <h2 className="text-lg font-bold text-white">Viimased avaldused</h2>
+                  <p className="text-xs text-zinc-400">
+                    Sinu esitatud whitelist- ja meeskonna avaldused
                   </p>
                 </div>
-
                 <Link
-                  href="/apply"
-                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500"
+                  href="/applications"
+                  className="text-xs font-semibold text-rose-400 hover:text-rose-300"
                 >
-                  + Loo uus karakter
+                  Vaata kõiki →
                 </Link>
               </div>
 
-              {userApplications.length === 0 ? (
-                <p className="py-8 text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                  TAOTLUSED PUUDUVAD
+              {userApplications.length === 0 && userStaffApplications.length === 0 ? (
+                <p className="py-8 text-center text-sm text-zinc-500">
+                  Ühtegi avaldust pole veel esitatud.
                 </p>
               ) : (
-                <div className="mt-5 overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-zinc-800/80 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                        <th className="py-2.5 pr-4">#</th>
-                        <th className="py-2.5 pr-4">KARAKTERI NIMI</th>
-                        <th className="py-2.5 pr-4">ESITATUD</th>
-                        <th className="py-2.5 pr-4">STAATUS</th>
-                        <th className="py-2.5 text-right"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-800/60">
-                      {userApplications.map((app, index) => (
-                        <tr key={app.id} className="hover:bg-zinc-900/40">
-                          <td className="py-3.5 pr-4 font-mono text-xs text-zinc-400">
-                            {userApplications.length - index}
-                          </td>
-                          <td className="py-3.5 pr-4 font-semibold text-white">
-                            {app.inGameName}
-                          </td>
-                          <td className="py-3.5 pr-4 text-zinc-400">
-                            {new Date(app.createdAt).toLocaleDateString("et-EE")}
-                          </td>
-                          <td className="py-3.5 pr-4">{getStatusBadge(app.status)}</td>
-                          <td className="py-3.5 text-right">
-                            <Link
-                              href="/applications"
-                              className="text-xs font-semibold text-indigo-400 transition hover:text-indigo-300"
-                            >
-                              Vaata taotlust →
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="mt-4 divide-y divide-zinc-800/70">
+                  {userApplications.map((app) => (
+                    <div
+                      key={app.id}
+                      className="flex flex-wrap items-center justify-between gap-3 py-3.5"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-white">
+                          Whitelist: {app.inGameName}
+                        </p>
+                        <p className="text-xs text-zinc-500">
+                          Esitatud {new Date(app.createdAt).toLocaleDateString("et-EE")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {getStatusPill(app.status)}
+                        <Link
+                          href="/applications"
+                          className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800"
+                        >
+                          Ava
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+
+                  {userStaffApplications.map((staffApp) => (
+                    <div
+                      key={staffApp.id}
+                      className="flex flex-wrap items-center justify-between gap-3 py-3.5"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-white">
+                          Meeskonna avaldus
+                        </p>
+                        <p className="text-xs text-zinc-500">
+                          Esitatud {new Date(staffApp.createdAt).toLocaleDateString("et-EE")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {getStatusPill(staffApp.status)}
+                        <Link
+                          href="/applications"
+                          className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800"
+                        >
+                          Ava
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </section>
           </div>
 
+          {/* PAREM VEERG: SERVERIGA ÜHENDAMINE JA TOP 10 */}
           <div className="space-y-6">
-            <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500">
-                    SERVER
-                  </p>
-                  <h2 className="mt-1 text-lg font-bold text-white">Liitu serveriga</h2>
-                </div>
-                <span
-                  className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
-                    serverInfo.online ? "text-emerald-400" : "text-zinc-400"
-                  }`}
-                >
-                  <span
-                    className={`h-2 w-2 rounded-full ${
-                      serverInfo.online ? "bg-emerald-400 animate-pulse" : "bg-zinc-500"
-                    }`}
-                  />
-                  {serverInfo.online ? "Online" : "Offline"}
-                </span>
-              </div>
-
-              <div className="mt-5 rounded-xl border border-zinc-800/90 bg-[#131722] p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
-                  MÄNGIJAID SERVERIS
-                </p>
-                <p className="mt-1 text-3xl font-extrabold text-white">
-                  {serverInfo.players}
-                  <span className="text-lg font-medium text-zinc-500">
-                    {" "}
-                    / {serverInfo.maxPlayers}
-                  </span>
-                </p>
-              </div>
+            <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6">
+              <h2 className="text-lg font-bold text-white">Ühenda serveriga</h2>
+              <p className="mt-1 text-xs text-zinc-400">
+                Ava FiveM ja liitu otse meie rollimänguserveriga.
+              </p>
 
               {serverInfo.connectCode ? (
-                <a
-                  href={`fivem://connect/cfx.re/join/${serverInfo.connectCode}`}
-                  className="mt-4 flex w-full items-center justify-between rounded-xl border border-zinc-700/80 bg-zinc-900/90 px-4 py-3 text-sm font-semibold text-white transition hover:border-indigo-500/50 hover:bg-zinc-800"
-                >
-                  <span>Mängima</span>
-                  <span className="text-indigo-400">▶</span>
-                </a>
+                <div className="mt-4 space-y-3">
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-950/70 px-3.5 py-2.5 font-mono text-xs text-zinc-300">
+                    connect cfx.re/join/{serverInfo.connectCode}
+                  </div>
+                  <a
+                    href={`fivem://connect/cfx.re/join/${serverInfo.connectCode}`}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500"
+                  >
+                    Liitu serveriga kohe
+                  </a>
+                </div>
               ) : (
-                <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-xs text-zinc-500">
-                  Määra FiveM serveri kood jaotises Admin → Bränding ja välimus.
+                <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-950/60 p-3.5 text-xs text-zinc-400">
+                  Serveri ühenduskood on seadistamisel (Admin → Bränding ja välimus).
                 </div>
               )}
             </section>
 
-            <section className="rounded-2xl border border-zinc-800/90 bg-[#0e1118] p-6 shadow-xl">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500">
-                EDETABEL
-              </p>
-              <h2 className="mt-1 text-lg font-bold text-white">
-                TOP 10 aktiivseimat karakterit
-              </h2>
+            <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-white">TOP 10 mängijat</h2>
+                <span className="text-xs text-zinc-500">Aktiivsus</span>
+              </div>
 
-              <div className="mt-4 divide-y divide-zinc-800/70">
+              <div className="mt-4 space-y-2.5">
                 {leaderboard.length === 0 ? (
-                  <p className="py-6 text-center text-xs text-zinc-500">
+                  <p className="py-4 text-center text-xs text-zinc-500">
                     Andmed puuduvad
                   </p>
                 ) : (
-                  leaderboard.map((entry) => (
+                  leaderboard.map((item) => (
                     <div
-                      key={entry.rank}
-                      className="flex items-center justify-between gap-3 py-3"
+                      key={item.rank}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-zinc-800/60 bg-zinc-950/50 px-3.5 py-2.5"
                     >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-zinc-100">
-                          {entry.primaryName}
-                        </p>
-                        <p className="truncate text-xs text-zinc-500">
-                          {entry.secondaryName}
-                        </p>
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
+                            item.rank === 1
+                              ? "bg-amber-500/20 text-amber-400"
+                              : item.rank === 2
+                                ? "bg-zinc-400/20 text-zinc-300"
+                                : item.rank === 3
+                                  ? "bg-orange-600/20 text-orange-400"
+                                  : "bg-zinc-800 text-zinc-500"
+                          }`}
+                        >
+                          {item.rank}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-zinc-100">
+                            {item.name}
+                          </p>
+                          <p className="truncate text-[11px] text-zinc-500">
+                            {item.sub}
+                          </p>
+                        </div>
                       </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-sm font-bold text-white">{entry.rightValue}</p>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-                          {entry.rightLabel}
-                        </p>
-                      </div>
+                      <span className="shrink-0 font-mono text-xs font-semibold text-zinc-400">
+                        {item.badge}
+                      </span>
                     </div>
                   ))
                 )}
