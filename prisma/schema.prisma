@@ -30,6 +30,8 @@ model User {
   addedSiteMembers       SiteMember[]        @relation("SiteMemberAddedBy")
   siteVisitors           SiteVisitor[]
   auditLogs              AuditLog[]          @relation("AuditActor")
+  tickets                 Ticket[]
+  ticketMessages          TicketMessage[]
 }
 
 model SiteMember {
@@ -282,4 +284,39 @@ model RuleSection {
 
   @@index([categoryId])
   @@index([categoryId, sortOrder])
+}
+model Ticket {
+  id          String          @id @default(cuid())
+  title       String
+  description String
+  category    String
+  priority    String          @default("Normaalne")
+  status      String          @default("OOTEL")
+  evidenceUrl String?
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages    TicketMessage[]
+  logs        TicketLog[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  content   String
+  isStaff   Boolean  @default(false)
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model TicketLog {
+  id        String   @id @default(cuid())
+  action    String
+  details   String?
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
