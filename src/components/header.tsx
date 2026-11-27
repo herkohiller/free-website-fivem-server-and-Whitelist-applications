@@ -14,7 +14,6 @@ export function Header() {
   const isAdmin = (session?.user as { isAdmin?: boolean } | undefined)?.isAdmin;
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Kui kasutaja POLE Discordiga sisse logitud, näita ainult paremal üleval sisselogimisnuppu
   if (status !== "authenticated" || !session?.user) {
     if (status === "loading") return null;
     return (
@@ -29,7 +28,6 @@ export function Header() {
     );
   }
 
-  // "Kogukond" on eemaldatud
   const navLinks = [
     { href: "/", label: "Avaleht" },
     { href: "/rules", label: "Reeglid" },
@@ -37,9 +35,11 @@ export function Header() {
     { href: "/applications", label: "Minu avaldused" },
     { href: "/apply", label: branding.whitelistNavLabel || "Whitelist" },
     { href: "/apply/staff", label: "Meeskond" },
-   ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : new Array()),
-
   ];
+
+  if (isAdmin) {
+    navLinks.push({ href: "/admin", label: "Admin" });
+  }
 
   const logoBlock = (
     <Link
@@ -130,7 +130,6 @@ export function Header() {
 
   return (
     <>
-      {/* MOBIILIVAADE */}
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-950/90 px-4 py-3 backdrop-blur md:hidden">
         {logoBlock}
         <button
@@ -150,7 +149,6 @@ export function Header() {
         </div>
       )}
 
-      {/* ARVUTIVAADE: Vasakpoolne fikseeritud külgmenüü */}
       <aside className="sticky top-0 z-30 hidden h-screen w-64 shrink-0 flex-col justify-between border-r border-zinc-800/80 bg-zinc-950/95 p-4 md:flex">
         <div className="space-y-6 overflow-y-auto">
           {logoBlock}
@@ -161,3 +159,4 @@ export function Header() {
     </>
   );
 }
+v
