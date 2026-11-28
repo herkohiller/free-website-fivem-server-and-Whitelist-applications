@@ -43,7 +43,7 @@ const STORE_ITEMS: Array<StoreItem> = [
       "Soeta endale ainulaadne lore-friendly sõiduk, mis valmib vastavalt sinu soovidele ja sobitub loomulikult serveri keskkonda.",
     price: "19.99 €",
     taxNote: "+ lisanduvad Tebexi maksud",
-    duration: "6 KUUD / PÜSIV",
+    duration: "PÜSIV",
     badge: "POPULAARNE",
     tebexUrl: process.env.NEXT_PUBLIC_TEBEX_ERITELLIMUS_URL || "https://tebex.io",
     features: [
