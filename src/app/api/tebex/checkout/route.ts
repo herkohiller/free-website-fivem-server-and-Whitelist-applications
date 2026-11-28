@@ -7,6 +7,8 @@ const ALLOWED_PACKAGES: Record<string, number> = {
   "custom-mlo": 7841515,
 };
 
+const TEBEX_API_BASE = ["https://", "headless.tebex.io", "/api"].join("");
+
 export async function POST(req: Request) {
   try {
     const session = await auth();
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
 
     // 1. Loome Tebex Headless ostukorvi
     const basketRes = await fetch(
-      `https://tebex.io{encodeURIComponent(token)}/baskets`,
+      `${TEBEX_API_BASE}/accounts/${encodeURIComponent(token)}/baskets`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,7 +77,7 @@ export async function POST(req: Request) {
 
     // 2. Lisame valitud paketi ostukorvi
     const addPkgRes = await fetch(
-      `https://tebex.io{encodeURIComponent(basketIdent)}/packages`,
+      `${TEBEX_API_BASE}/baskets/${encodeURIComponent(basketIdent)}/packages`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
