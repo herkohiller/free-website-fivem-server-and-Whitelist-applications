@@ -14,10 +14,10 @@ type StoreItem = {
   duration: string;
   badge: string;
   tebexUrl: string;
-  features: string;
+  features: Array<string>;
 };
 
-const STORE_ITEMS: StoreItem = [
+const STORE_ITEMS: Array<StoreItem> = [
   {
     id: "teine-karakter",
     category: "Karakter",
@@ -164,7 +164,7 @@ export default async function PoodPage() {
                   href={item.tebexUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-rose-600/25 transition hover:bg-rose-500 active:scale-"
+                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-rose-600/25 transition hover:bg-rose-500 active:scale-[0.99]"
                 >
                   Osta kohe →
                 </a>
