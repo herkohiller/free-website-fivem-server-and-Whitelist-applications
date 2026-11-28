@@ -37,15 +37,15 @@ const STORE_ITEMS: Array<StoreItem> = [
   {
     id: "eritellimus",
     category: "Sõidukid",
-    title: "Eritellimus",
+    title: "Imporditud Sõiduk",
     description:
-      "Soeta endale ainulaadne lore-friendly sõiduk, mis valmib vastavalt sinu soovidele ja sobitub loomulikult serveri keskkonda.",
+      "Soeta endale unikaalne lore-friendly sõiduk koos kohandatud numbrimärgiga, mis sobitub loomulikult serveri keskkonda.",
     price: "19.99 €",
     taxNote: "+ lisanduvad Tebexi maksud",
     duration: "PÜSIV",
     badge: "POPULAARNE",
     features: [
-      "Lore-friendly mudel vastavalt soovile",
+      "Lore-friendly mudel serveri valikust",
       "Kohandatud numbrimärk hinna sees",
       "Kiire paigaldus serverisse",
     ],
@@ -53,15 +53,15 @@ const STORE_ITEMS: Array<StoreItem> = [
   {
     id: "custom-mlo",
     category: "Kinnisvara",
-    title: "Custom MLO",
+    title: "Maja MLO",
     description:
-      "Sinu ettevõttele, gängile või kodule loodud eksklusiivne siseruum (MLO) soovitud asukohas Los Santoses.",
+      "Sinu ettevõttele, gängile või kodule loodud privaatne elamu siseruum (MLO) koos panipaikade ja ukselukkudega.",
     price: "29.99 €",
     taxNote: "+ lisanduvad Tebexi maksud",
     duration: "PÜSIV",
     badge: "PREMIUM",
     features: [
-      "Sinu valitud asukoht kaardil",
+      "Privaatne kinnisvara siseruum",
       "Optimeeritud FPS ja sujuv töö",
       "Privaatsed ukselukud ja panipaigad",
     ],
@@ -130,7 +130,7 @@ export default function PoodPage() {
               Serveri <span className="text-rose-500">Pood</span>
             </h1>
             <p className="mt-1 text-sm text-zinc-400">
-              Toeta serveri arengut ja soeta endale teine karakter, eritellimus või oma Custom MLO.
+              Toeta serveri arengut ja soeta endale teine karakter, imporditud sõiduk või oma Maja MLO.
             </p>
           </div>
 
