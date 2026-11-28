@@ -10,21 +10,39 @@ type StoreItem = {
   title: string;
   description: string;
   price: string;
+  taxNote: string;
   duration: string;
   badge: string;
   tebexUrl: string;
-  features: string[];
+  features: string;
 };
 
-// ASENDA SIIN HINNAD JA OMA TEBEXI PAKETTIDE LINGID:
-const STORE_ITEMS: StoreItem[] = [
+const STORE_ITEMS: StoreItem = [
+  {
+    id: "teine-karakter",
+    category: "Karakter",
+    title: "Teine karakter",
+    description:
+      "Ava oma kontole lisakarakteri koht, et mängida serveris korraga kahte täiesti erinevat tegelast ja lugu.",
+    price: "9.99 €",
+    taxNote: "+ lisanduvad Tebexi maksud",
+    duration: "PÜSIV",
+    badge: "SOODNE",
+    tebexUrl: process.env.NEXT_PUBLIC_TEBEX_KARAKTER_URL || "https://tebex.io",
+    features: [
+      "Lisakarakteri pesa sinu kontole",
+      "Eraldi pank, sõidukid ja elukoht",
+      "Püsiv ligipääs pärast aktiveerimist",
+    ],
+  },
   {
     id: "eritellimus",
     category: "Sõidukid",
     title: "Eritellimus",
     description:
       "Soeta endale ainulaadne lore-friendly sõiduk, mis valmib vastavalt sinu soovidele ja sobitub loomulikult serveri keskkonda.",
-    price: "25.00 €",
+    price: "19.99 €",
+    taxNote: "+ lisanduvad Tebexi maksud",
     duration: "6 KUUD / PÜSIV",
     badge: "POPULAARNE",
     tebexUrl: process.env.NEXT_PUBLIC_TEBEX_ERITELLIMUS_URL || "https://tebex.io",
@@ -35,28 +53,13 @@ const STORE_ITEMS: StoreItem[] = [
     ],
   },
   {
-    id: "teie-karakter",
-    category: "Karakter",
-    title: "Teie karakter",
-    description:
-      "Ainulaadne kohandatud karakteri välimus (Custom Ped) või eksklusiivsed riided, et sinu tegelane eristuks linnapildis.",
-    price: "15.00 €",
-    duration: "PÜSIV",
-    badge: "EKSKLUSIIVNE",
-    tebexUrl: process.env.NEXT_PUBLIC_TEBEX_KARAKTER_URL || "https://tebex.io",
-    features: [
-      "Unikaalne Custom Ped mudel",
-      "Isikupärane stiil ja detailid",
-      "Püsiv ligipääs sinu kontole",
-    ],
-  },
-  {
     id: "custom-mlo",
     category: "Kinnisvara",
     title: "Custom MLO",
     description:
       "Sinu ettevõttele, gängile või kodule loodud eksklusiivne siseruum (MLO) soovitud asukohas Los Santoses.",
-    price: "35.00 €",
+    price: "30.00 €",
+    taxNote: "+ lisanduvad Tebexi maksud",
     duration: "PÜSIV",
     badge: "PREMIUM",
     tebexUrl: process.env.NEXT_PUBLIC_TEBEX_MLO_URL || "https://tebex.io",
@@ -84,7 +87,6 @@ export default async function PoodPage() {
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(244,63,94,0.12),_transparent_50%),radial-gradient(ellipse_at_bottom_left,_rgba(59,130,246,0.08),_transparent_50%)]" />
 
       <div className="relative z-10 mx-auto max-w-7xl space-y-6">
-        {/* Päis */}
         <header className="flex flex-col justify-between gap-4 rounded-3xl border border-white/10 bg-zinc-900/55 p-6 shadow-2xl backdrop-blur-xl sm:flex-row sm:items-center">
           <div>
             <div className="flex items-center gap-2">
@@ -96,7 +98,7 @@ export default async function PoodPage() {
               Serveri <span className="text-rose-500">Pood</span>
             </h1>
             <p className="mt-1 text-sm text-zinc-400">
-              Toeta serveri arengut ja soeta endale eritellimus, unikaalne karakter või oma MLO.
+              Toeta serveri arengut ja soeta endale teine karakter, eritellimus või oma Custom MLO.
             </p>
           </div>
 
@@ -110,7 +112,6 @@ export default async function PoodPage() {
           </div>
         </header>
 
-        {/* Toodete kaardid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {STORE_ITEMS.map((item) => (
             <div
@@ -127,7 +128,7 @@ export default async function PoodPage() {
                   </span>
                 </div>
 
-                <h2 className="mt-4 text-xl font-bold text-white group-hover:text-rose-400 transition">
+                <h2 className="mt-4 text-xl font-bold text-white transition group-hover:text-rose-400">
                   {item.title}
                 </h2>
 
@@ -152,6 +153,7 @@ export default async function PoodPage() {
                       Hind
                     </p>
                     <p className="text-2xl font-black text-white">{item.price}</p>
+                    <p className="mt-0.5 text-[11px] text-zinc-400">{item.taxNote}</p>
                   </div>
                   <span className="text-xs font-semibold text-zinc-400">
                     {item.duration}
@@ -171,9 +173,8 @@ export default async function PoodPage() {
           ))}
         </div>
 
-        {/* Info kast */}
         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-4 text-center text-xs text-zinc-400 backdrop-blur-md">
-          Pärast ostu sooritamist Tebexi keskkonnas ava meie Discordi serveris <strong className="text-zinc-200">Ticket</strong>, et edastada oma tellimuse detailid (soovitud auto mudel, ped või MLO asukoht).
+          Kõikidele hindadele lisanduvad Tebexi teenus- ja käibemaksud vastavalt sinu asukohariigile. Pärast ostu sooritamist ava meie Discordi serveris <strong className="text-zinc-200">Ticket</strong>, et edastada oma tellimuse detailid.
         </div>
       </div>
     </div>
