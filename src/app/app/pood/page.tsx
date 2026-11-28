@@ -104,10 +104,10 @@ export default async function PoodPage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/"
+              href="/tickets"
               className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:bg-white/10 hover:text-white"
             >
-              ← Tagasi avalehele
+              🎫 Minu ticketid
             </Link>
           </div>
         </header>
@@ -164,7 +164,7 @@ export default async function PoodPage() {
                   href={item.tebexUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-rose-600/25 transition hover:bg-rose-500 active:scale-[0.99]"
+                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-rose-600/25 transition hover:bg-rose-500 active:scale-"
                 >
                   Osta kohe →
                 </a>
@@ -174,7 +174,11 @@ export default async function PoodPage() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-4 text-center text-xs text-zinc-400 backdrop-blur-md">
-          Kõikidele hindadele lisanduvad Tebexi teenus- ja käibemaksud vastavalt sinu asukohariigile. Pärast ostu sooritamist ava meie Discordi serveris <strong className="text-zinc-200">Ticket</strong>, et edastada oma tellimuse detailid.
+          Kõikidele hindadele lisanduvad Tebexi teenus- ja käibemaksud vastavalt sinu asukohariigile. Pärast ostu sooritamist ava veebilehel{" "}
+          <Link href="/tickets" className="font-semibold text-rose-400 underline hover:text-rose-300">
+            Minu ticketid
+          </Link>{" "}
+          ja edasta oma tellimuse detailid.
         </div>
       </div>
     </div>
