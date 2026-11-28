@@ -58,7 +58,7 @@ const STORE_ITEMS: Array<StoreItem> = [
     title: "Custom MLO",
     description:
       "Sinu ettevõttele, gängile või kodule loodud eksklusiivne siseruum (MLO) soovitud asukohas Los Santoses.",
-    price: "30.00 €",
+    price: "29.99 €",
     taxNote: "+ lisanduvad Tebexi maksud",
     duration: "PÜSIV",
     badge: "PREMIUM",
