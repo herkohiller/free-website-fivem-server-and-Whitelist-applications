@@ -1,8 +1,9 @@
-import Link from "next/link";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+"use client";
 
-export const dynamic = "force-dynamic";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type StoreItem = {
   id: string;
@@ -13,7 +14,6 @@ type StoreItem = {
   taxNote: string;
   duration: string;
   badge: string;
-  tebexUrl: string;
   features: Array<string>;
 };
 
@@ -28,7 +28,6 @@ const STORE_ITEMS: Array<StoreItem> = [
     taxNote: "+ lisanduvad Tebexi maksud",
     duration: "PÜSIV",
     badge: "SOODNE",
-    tebexUrl: process.env.NEXT_PUBLIC_TEBEX_KARAKTER_URL || "https://tebex.io",
     features: [
       "Lisakarakteri pesa sinu kontole",
       "Eraldi pank, sõidukid ja elukoht",
@@ -45,7 +44,6 @@ const STORE_ITEMS: Array<StoreItem> = [
     taxNote: "+ lisanduvad Tebexi maksud",
     duration: "PÜSIV",
     badge: "POPULAARNE",
-    tebexUrl: process.env.NEXT_PUBLIC_TEBEX_ERITELLIMUS_URL || "https://tebex.io",
     features: [
       "Lore-friendly mudel vastavalt soovile",
       "Kohandatud numbrimärk hinna sees",
@@ -62,7 +60,6 @@ const STORE_ITEMS: Array<StoreItem> = [
     taxNote: "+ lisanduvad Tebexi maksud",
     duration: "PÜSIV",
     badge: "PREMIUM",
-    tebexUrl: process.env.NEXT_PUBLIC_TEBEX_MLO_URL || "https://tebex.io",
     features: [
       "Sinu valitud asukoht kaardil",
       "Optimeeritud FPS ja sujuv töö",
@@ -71,11 +68,46 @@ const STORE_ITEMS: Array<StoreItem> = [
   },
 ];
 
-export default async function PoodPage() {
-  const session = await auth();
+export default function PoodPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  if (!session?.user) {
-    redirect("/");
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
+
+  if (status === "loading" || !session?.user) {
+    return null;
+  }
+
+  async function handleBuy(itemId: string) {
+    setErrorMsg(null);
+    setLoadingId(itemId);
+
+    try {
+      const res = await fetch("/api/tebex/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId }),
+      });
+
+      const data = (await res.json()) as { url?: string; error?: string };
+
+      if (!res.ok || !data.url) {
+        setErrorMsg(data.error || "Makselehe avamine ebaõnnestus.");
+        setLoadingId(null);
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch {
+      setErrorMsg("Ühenduse viga. Proovi uuesti.");
+      setLoadingId(null);
+    }
   }
 
   return (
@@ -112,73 +144,82 @@ export default async function PoodPage() {
           </div>
         </header>
 
+        {errorMsg && (
+          <div className="rounded-2xl border border-rose-500/40 bg-rose-500/15 p-4 text-sm text-rose-200">
+            ⚠️ {errorMsg}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {STORE_ITEMS.map((item) => (
-            <div
-              key={item.id}
-              className="group relative flex flex-col justify-between rounded-3xl border border-white/10 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl transition duration-300 hover:border-rose-500/40 hover:bg-zinc-900/80"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-zinc-300">
-                    {item.category}
-                  </span>
-                  <span className="rounded-full bg-rose-500/15 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-rose-300 ring-1 ring-inset ring-rose-500/30">
-                    {item.badge}
-                  </span>
-                </div>
-
-                <h2 className="mt-4 text-xl font-bold text-white transition group-hover:text-rose-400">
-                  {item.title}
-                </h2>
-
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-                  {item.description}
-                </p>
-
-                <ul className="mt-5 space-y-2 border-t border-white/10 pt-4 text-xs text-zinc-300">
-                  {item.features.map((feat, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                      {feat}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-6 border-t border-white/10 pt-4">
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                      Hind
-                    </p>
-                    <p className="text-2xl font-black text-white">{item.price}</p>
-                    <p className="mt-0.5 text-[11px] text-zinc-400">{item.taxNote}</p>
+          {STORE_ITEMS.map((item) => {
+            const isLoading = loadingId === item.id;
+            return (
+              <div
+                key={item.id}
+                className="group relative flex flex-col justify-between rounded-3xl border border-white/10 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl transition duration-300 hover:border-rose-500/40 hover:bg-zinc-900/80"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-zinc-300">
+                      {item.category}
+                    </span>
+                    <span className="rounded-full bg-rose-500/15 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-rose-300 ring-1 ring-inset ring-rose-500/30">
+                      {item.badge}
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-zinc-400">
-                    {item.duration}
-                  </span>
+
+                  <h2 className="mt-4 text-xl font-bold text-white transition group-hover:text-rose-400">
+                    {item.title}
+                  </h2>
+
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                    {item.description}
+                  </p>
+
+                  <ul className="mt-5 space-y-2 border-t border-white/10 pt-4 text-xs text-zinc-300">
+                    {item.features.map((feat, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        {feat}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <a
-                  href={item.tebexUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-rose-600/25 transition hover:bg-rose-500"
-                >
-                  Osta kohe →
-                </a>
+                <div className="mt-6 border-t border-white/10 pt-4">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                        Hind
+                      </p>
+                      <p className="text-2xl font-black text-white">{item.price}</p>
+                      <p className="mt-0.5 text-[11px] text-zinc-400">{item.taxNote}</p>
+                    </div>
+                    <span className="text-xs font-semibold text-zinc-400">
+                      {item.duration}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={loadingId !== null}
+                    onClick={() => handleBuy(item.id)}
+                    className="mt-4 flex w-full items-center justify-center rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-rose-600/25 transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isLoading ? "Avan makselehte..." : "Osta kohe →"}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-4 text-center text-xs text-zinc-400 backdrop-blur-md">
-          Kõikidele hindadele lisanduvad Tebexi teenus- ja käibemaksud vastavalt sinu asukohariigile. Pärast ostu sooritamist ava veebilehel{" "}
+          Kõikidele hindadele lisanduvad Tebexi teenus- ja käibemaksud vastavalt sinu asukohariigile. Pärast ostu sooritamist suunatakse sind automaatselt{" "}
           <Link href="/tickets" className="font-semibold text-rose-400 underline hover:text-rose-300">
             Minu ticketid
           </Link>{" "}
-          ja edasta oma tellimuse detailid.
+          lehele, kus saad edastada oma tellimuse detailid.
         </div>
       </div>
     </div>
