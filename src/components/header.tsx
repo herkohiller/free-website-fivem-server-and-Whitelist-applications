@@ -28,15 +28,15 @@ export function Header() {
     );
   }
 
-    const navLinks = [
+  const navLinks = [
     { href: "/", label: "Avaleht", icon: "🏠" },
+    { href: "/pood", label: "Pood", icon: "🛒" },
     { href: "/rules", label: "Reeglid", icon: "📜" },
     { href: "/applications", label: "Minu avaldused", icon: "📄" },
     { href: "/tickets", label: "Minu ticketid", icon: "🎫" },
     { href: "/apply", label: branding.whitelistNavLabel || "Whitelist", icon: "✍️" },
     { href: "/apply/staff", label: "Meeskond", icon: "🛡️" },
   ];
-
 
   if (isAdmin) {
     navLinks.push({ href: "/admin", label: "Admin", icon: "⚙️" });
@@ -101,7 +101,6 @@ export function Header() {
           collapsed ? "w-[76px]" : "w-64"
         }`}
       >
-        {/* Ilus ümmargune nupp täpselt menüü paremal äärel */}
         <button
           type="button"
           onClick={() => setCollapsed((prev) => !prev)}
@@ -112,7 +111,6 @@ export function Header() {
         </button>
 
         <div className="space-y-5 overflow-hidden">
-          {/* Logo ja nimi */}
           <Link
             href="/"
             className={`flex items-center gap-3 py-1 font-bold text-zinc-100 ${
@@ -132,7 +130,6 @@ export function Header() {
             )}
           </Link>
 
-          {/* Lingid */}
           <nav className="flex flex-col gap-1.5 border-t border-zinc-800/80 pt-4" aria-label="Külgmenüü">
             {navLinks.map((link) => {
               const isActive =
@@ -159,7 +156,6 @@ export function Header() {
           </nav>
         </div>
 
-        {/* Kasutaja plokk all */}
         <div className="border-t border-zinc-800/80 pt-4">
           <div className="space-y-2.5">
             <div
